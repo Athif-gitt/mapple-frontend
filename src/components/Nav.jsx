@@ -8,8 +8,8 @@ function Nav() {
 
   useEffect(() => {
     const fetchCartQuantity = async () => {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user) return;
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
       setLoggedIn(true);
 
@@ -56,7 +56,7 @@ function Nav() {
             <li
               className="hover:text-blue-600 cursor-pointer"
               onClick={() => {
-                localStorage.removeItem("user");
+                localStorage.removeItem("token");
                 setLoggedIn(false);
               }}
             >

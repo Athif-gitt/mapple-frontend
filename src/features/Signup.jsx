@@ -40,27 +40,38 @@ function Signup() {
   };
 
   const handleSubmit = async (e) => {
-    const userData = { name, email, password, confirmPassword, cart : [] };
-    e.preventDefault();
-    const validationErrors = validate();
+  e.preventDefault();
+  const validationErrors = validate();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
-      return;
+  if (Object.keys(validationErrors).length > 0) {
+    setError(validationErrors);
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      "http://127.0.0.1:8000/api/auth/register/",
+      {
+        username: name,
+        email,
+        password,
+      }
+    );
+
+    alert("Account created successfully!");
+    navigate("/login");
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.response?.status === 400) {
+      alert("User already exists or invalid data");
+    } else {
+      alert("Error creating account. Try again.");
     }
+  }
+};
 
-    try {
-      const res = await axios.post("http://localhost:3010/users", userData, {});
-
-      console.log("User created:", res.data);
-      alert("Success! Account created.");
-
-      navigate("/login");
-    } catch (err) {
-      console.error("Error creating user:", err);
-      alert("Error creating account. Please try again.");
-    }
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

@@ -32,36 +32,34 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
+  e.preventDefault();
+  const validationErrors = validate();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
-      return;
-    }
+  if (Object.keys(validationErrors).length > 0) {
+    setError(validationErrors);
+    return;
+  }
 
-    try {
-      const res = await axios.get(
-        `http://localhost:3010/users?name=${name}&email=${email}&password=${password}`
-      );
-
-      if (res.data.length > 0) {
-        const user = res.data[0]; // the mached user
-
-        if (user.email === "admin@gmail.com" && user.password === "admin1234") {
-          localStorage.setItem("user", JSON.stringify(user));
-          navigate("/admin-home");
-        } else {
-          localStorage.setItem("user", JSON.stringify(user));
-          navigate("/");
-        }
-      } else {
-        alert("Credentials do not match!");
+  try {
+    const res = await axios.post(
+      "http://127.0.0.1:8000/api/auth/login/",
+      {
+        username: name,
+        password: password,
       }
-    } catch (err) {
-      console.error("Login error:", err);
-    }
-  };
+    );
+
+    // Save token in browser storage
+    localStorage.setItem("token", res.data.token);
+
+    // Redirect after login
+    navigate("/");
+
+  } catch (err) {
+    console.error(err);
+    alert("Invalid username or password");
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
