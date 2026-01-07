@@ -50,7 +50,8 @@ function Login() {
     );
 
     // Save token in browser storage
-    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("access-token", res.data.access);
+    localStorage.setItem("refresh-token", res.data.refresh);
 
     // Redirect after login
     navigate("/");

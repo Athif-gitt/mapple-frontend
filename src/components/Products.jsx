@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Nav from "./Nav";
 
 function Products() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const category = params.get("category");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3010/products")
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.error(err));
-  }, []);
+  const url = category
+    ? `http://127.0.0.1:8000/api/products/?category=${category}`
+    : `http://127.0.0.1:8000/api/products/`;
+
+  axios
+    .get(url)
+    .then((res) => setProducts(res.data))
+    .catch((err) => console.error(err));
+}, [category]);
 
   const handleCardClick = (item) => {
     navigate("/product-details", { state: item });
@@ -49,25 +56,27 @@ function Products() {
     <div className="p-0 bg-gray-50 min-h-screen">
       <Nav />
 
-      <div className="flex gap-3 mt-3 px-6">
+      <div className="flex justify-center gap-3 mt-3 px-6">
         <button
-          onClick={() => navigate("/iphone")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          iPhone
-        </button>
-        <button
-          onClick={() => navigate("/macbook")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          MacBook
-        </button>
-        <button
-          onClick={() => navigate("/earpod")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          AirPods
-        </button>
+  onClick={() => navigate("/products?category=iphone")}
+  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+>
+  iPhone
+</button>
+
+<button
+  onClick={() => navigate("/products?category=macbook")}
+  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+>
+  MacBook
+</button>
+
+<button
+  onClick={() => navigate("/products?category=airpods")}
+  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+>
+  AirPods
+</button>
       </div>
 
       <h1 className="text-3xl font-bold text-center text-gray-800 my-5">

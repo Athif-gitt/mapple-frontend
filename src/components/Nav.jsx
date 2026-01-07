@@ -8,7 +8,7 @@ function Nav() {
 
   useEffect(() => {
     const fetchCartQuantity = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access-token");
       if (!token) return;
 
       setLoggedIn(true);
@@ -56,7 +56,8 @@ function Nav() {
             <li
               className="hover:text-blue-600 cursor-pointer"
               onClick={() => {
-                localStorage.removeItem("token");
+                localStorage.removeItem("access-token");
+                localStorage.removeItem("refresh-token");
                 setLoggedIn(false);
               }}
             >
