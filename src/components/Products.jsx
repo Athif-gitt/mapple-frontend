@@ -52,6 +52,16 @@ function Products() {
 
   const pageNumbers = [...Array(totalPages).keys()].map((n) => n + 1);
 
+  const handleAddToWishlist = async (item) => {
+    const token = localStorage.getItem("access-token");
+    await axios.post(
+      "http://127.0.0.1:8000/api/wishlist/",
+      { product_id: item.id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert("Added to Wishlst 👍");
+  };
+
   return (
     <div className="p-0 bg-gray-50 min-h-screen">
       <Nav />
@@ -92,12 +102,27 @@ function Products() {
             <div
               key={item.id}
               onClick={() => handleCardClick(item)}
-              className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-4 cursor-pointer"
+              className="relative bg-white rounded-xl shadow-md hover:shadow-lg transition p-4 cursor-pointer"
             >
-              <img src={item.image} className="h-40 w-full object-contain mb-3" />
+              {/* Wishlist heart icon */}
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToWishlist(item);
+                }}
+                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl transition cursor-pointer"
+              >
+                ❤️
+              </span>
+
+              <img
+                src={item.image}
+                className="h-40 w-full object-contain mb-3"
+              />
               <h3 className="font-semibold">{item.name}</h3>
               <p className="text-gray-500 text-sm">{item.description}</p>
               <p className="text-blue-600 font-bold mt-2">${item.price}</p>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -110,7 +135,9 @@ function Products() {
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500 col-span-full">No products found.</p>
+          <p className="text-center text-gray-500 col-span-full">
+            No products found.
+          </p>
         )}
       </div>
 

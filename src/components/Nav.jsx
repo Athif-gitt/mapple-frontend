@@ -7,32 +7,31 @@ function Nav() {
   const [cartQuantity, setCartQuantity] = useState(0);
 
   useEffect(() => {
-  const fetchCartQuantity = async () => {
-    const token = localStorage.getItem("access-token");
-    if (!token) {
-      setLoggedIn(false);
-      return;
-    }
+    const fetchCartQuantity = async () => {
+      const token = localStorage.getItem("access-token");
+      if (!token) {
+        setLoggedIn(false);
+        return;
+      }
 
-    setLoggedIn(true);
+      setLoggedIn(true);
 
-    try {
-      const res = await axios.get("http://127.0.0.1:8000/api/cart/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/api/cart/", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const items = res.data.items || [];
-      const totalQuantity = items.reduce(
-        (acc, item) => acc + item.quantity,
-        0
-      );
+        const items = res.data.items || [];
+        const totalQuantity = items.reduce(
+          (acc, item) => acc + item.quantity,
+          0
+        );
 
-      setCartQuantity(totalQuantity);
-    } catch (err) {
-      console.error("Failed to fetch cart:", err);
-    }
-  };
-
+        setCartQuantity(totalQuantity);
+      } catch (err) {
+        console.error("Failed to fetch cart:", err);
+      }
+    };
 
     fetchCartQuantity();
   }, []);
@@ -47,6 +46,11 @@ function Nav() {
           </li>
           <li className="hover:text-blue-600 cursor-pointer">
             <Link to="/products">Products</Link>
+          </li>
+          <li>
+            <a className="hover:text-blue-600 cursor-pointer relative">
+              <Link to="/wishlist">Wishlist </Link>
+            </a>
           </li>
           <li className="hover:text-blue-600 cursor-pointer relative">
             <Link to="/cart">

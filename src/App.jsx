@@ -10,10 +10,11 @@ import AirPod from "./components/Products/AirPod";
 import MacBook from "./components/Products/MacBook";
 import Footer from "./components/Footer";
 import ProductDetails from "./components/ProductDetails";
-import AdminHome from "./Admin/Pages/AdminHome"
+import AdminHome from "./Admin/Pages/AdminHome";
 import Payment from "./components/Payment";
 import Confirmation from "./components/Confirmation";
 import Orders from "./components/Orders";
+import Wishlist from "./components/Wishlist";
 
 function App() {
   return (
@@ -31,8 +32,9 @@ function App() {
         <Route path="/payment" element={<Payment />}></Route>
         <Route path="/orders" element={<Orders />}></Route>
         <Route path="/confirmation" element={<Confirmation />}></Route>
-         <Route path="/product-details" element={<ProductDetails />} />
+        <Route path="/product-details" element={<ProductDetails />} />
         <Route path="/admin-home/*" element={<AdminHome />} />
+        <Route path="/wishlist" element={<Wishlist />}></Route>
       </Routes>
       <Footer />
     </div>
