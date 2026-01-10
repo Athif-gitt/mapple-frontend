@@ -7,24 +7,32 @@ function Nav() {
   const [cartQuantity, setCartQuantity] = useState(0);
 
   useEffect(() => {
-    const fetchCartQuantity = async () => {
-      const token = localStorage.getItem("access-token");
-      if (!token) return;
+  const fetchCartQuantity = async () => {
+    const token = localStorage.getItem("access-token");
+    if (!token) {
+      setLoggedIn(false);
+      return;
+    }
 
-      setLoggedIn(true);
+    setLoggedIn(true);
 
-      try {
-        const res = await axios.get(`http://localhost:3010/users/${user.id}`);
-        const cartItems = res.data.cart || [];
-        const totalQuantity = cartItems.reduce(
-          (acc, item) => acc + item.quantity,
-          0
-        );
-        setCartQuantity(totalQuantity);
-      } catch (err) {
-        console.error("Failed to fetch cart:", err);
-      }
-    };
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/api/cart/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const items = res.data.items || [];
+      const totalQuantity = items.reduce(
+        (acc, item) => acc + item.quantity,
+        0
+      );
+
+      setCartQuantity(totalQuantity);
+    } catch (err) {
+      console.error("Failed to fetch cart:", err);
+    }
+  };
+
 
     fetchCartQuantity();
   }, []);

@@ -5,110 +5,146 @@ import Nav from "./Nav";
 
 function Products() {
   const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const category = params.get("category");
+  const [search, setSearch] = useState("");
+
+  const fetchProducts = async (page = 1) => {
+    const token = localStorage.getItem("access-token");
+    if (!token) return;
+
+    let url = `http://127.0.0.1:8000/api/products/?page=${page}`;
+
+    if (category) url += `&category=${category}`;
+    if (search) url += `&search=${search}`;
+
+    const res = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setProducts(res.data.results);
+    setCurrentPage(page);
+    setTotalPages(Math.ceil(res.data.count / 1)); // 1 is PAGE_SIZE
+  };
 
   useEffect(() => {
-  const url = category
-    ? `http://127.0.0.1:8000/api/products/?category=${category}`
-    : `http://127.0.0.1:8000/api/products/`;
-
-  axios
-    .get(url)
-    .then((res) => setProducts(res.data))
-    .catch((err) => console.error(err));
-}, [category]);
+    fetchProducts(1);
+  }, [category, search]);
 
   const handleCardClick = (item) => {
     navigate("/product-details", { state: item });
   };
 
   const handleAddToCart = async (item) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!user) {
-      alert("Please login first!");
-      return;
-    }
-
-    const cart = user.cart || [];
-    const existingItem = cart.find((i) => i.id === item.id);
-
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      cart.push({ ...item, quantity: 1 });
-    }
-
-    try {
-      const res = await axios.patch(`http://localhost:3010/users/${user.id}`, { cart });
-      localStorage.setItem("user", JSON.stringify(res.data));
-      navigate("/cart");
-    } catch (err) {
-      console.error("Error updating cart:", err);
-      alert("Failed to add to cart. Try again.");
-    }
+    const token = localStorage.getItem("access-token");
+    await axios.post(
+      "http://127.0.0.1:8000/api/cart/",
+      { product_id: item.id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    navigate("/cart");
   };
+
+  const pageNumbers = [...Array(totalPages).keys()].map((n) => n + 1);
 
   return (
     <div className="p-0 bg-gray-50 min-h-screen">
       <Nav />
 
-      <div className="flex justify-center gap-3 mt-3 px-6">
-        <button
-  onClick={() => navigate("/products?category=iphone")}
-  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
->
-  iPhone
-</button>
-
-<button
-  onClick={() => navigate("/products?category=macbook")}
-  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
->
-  MacBook
-</button>
-
-<button
-  onClick={() => navigate("/products?category=airpods")}
-  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
->
-  AirPods
-</button>
+      {/* Search */}
+      <div className="flex justify-center mt-4 px-6">
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full max-w-md"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
+      {/* Categories */}
+      <div className="flex justify-center gap-3 mt-6 px-6">
+        {["iphone", "macbook", "airpods"].map((c) => (
+          <button
+            key={c}
+            onClick={() => navigate(`/products?category=${c}`)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            {c.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {/* Title */}
       <h1 className="text-3xl font-bold text-center text-gray-800 my-5">
-        All Products
+        {category ? `${category.toUpperCase()} Products` : "All Products"}
       </h1>
 
+      {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6">
-        {products.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => handleCardClick(item)}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-4 cursor-pointer"
-          >
-            <img
-              src={item.image}
-              alt={item.name}
-              className="h-40 w-full object-contain mb-3"
-            />
-            <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
-            <p className="text-gray-500 text-sm">{item.description}</p>
-            <p className="text-blue-600 font-bold mt-2">${item.price}</p>
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent card click
-                handleAddToCart(item);
-              }}
-              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full"
+        {products.length > 0 ? (
+          products.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => handleCardClick(item)}
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-4 cursor-pointer"
             >
-              Add to Cart
-            </button>
-          </div>
+              <img src={item.image} className="h-40 w-full object-contain mb-3" />
+              <h3 className="font-semibold">{item.name}</h3>
+              <p className="text-gray-500 text-sm">{item.description}</p>
+              <p className="text-blue-600 font-bold mt-2">${item.price}</p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart(item);
+                }}
+                className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full"
+              >
+                Add to Cart
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500 col-span-full">No products found.</p>
+        )}
+      </div>
+
+      {/* PAGINATION UI */}
+      <div className="flex justify-center items-center gap-2 mt-8 pb-10">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => fetchProducts(currentPage - 1)}
+          className="px-3 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        {pageNumbers.map((num) => (
+          <button
+            key={num}
+            onClick={() => fetchProducts(num)}
+            className={`px-3 py-2 rounded ${
+              num === currentPage
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            {num}
+          </button>
         ))}
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => fetchProducts(currentPage + 1)}
+          className="px-3 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

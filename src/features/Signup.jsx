@@ -67,7 +67,7 @@ function Signup() {
     if (err.response?.status === 400) {
       alert("User already exists or invalid data");
     } else {
-      alert("Error creating account. Try again.");
+      alert(err.response.Object);
     }
   }
 };
