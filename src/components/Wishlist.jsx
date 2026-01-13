@@ -25,6 +25,7 @@ function Wishlist() {
     const token = localStorage.getItem("access-token");
     await axios.delete(
       `http://127.0.0.1:8000/api/wishlist/item/${itemId}/`,
+      
       { headers: { Authorization: `Bearer ${token}` } }
     );
     getWishlist();
