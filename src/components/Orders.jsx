@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import Nav from "./Nav";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const currentUser = JSON.parse(localStorage.getItem("user"));
-      if (!currentUser) return;
+      const token = localStorage.getItem("access-token");
+      if (!token) return;
 
       try {
-        const res = await axios.get(`http://localhost:3010/users/${currentUser.id}`);
-        const userData = res.data;
+        const res = await axios.get(
+          "http://127.0.0.1:8000/api/orders/",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        setOrders(userData.purchase || []);
+        console.log("Orders fetched:", res.data);
+        setOrders(res.data.results || []);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
       }
@@ -22,50 +27,49 @@ export default function Orders() {
     fetchOrders();
   }, []);
 
-  const total = orders.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
-
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Your Order</h1>
+    <div className="min-h-screen bg-gray-100 p-0">
+      <Nav />
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Your Orders</h1>
 
       {orders.length > 0 ? (
         <div className="space-y-4">
-          {orders.map((item, index) => (
+          {orders.map((order) => (
             <div
-              key={index}
-              className="flex items-center bg-white p-4 rounded-lg shadow-md"
+              key={order.id}
+              className="bg-white p-4 rounded-lg shadow-md space-y-2"
             >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="h-20 w-20 object-contain mr-4"
-              />
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold">{item.name}</h2>
-                <p className="text-gray-500">{item.description}</p>
-                <p className="text-blue-600 font-bold mt-1">
-                  ${item.price} x {item.quantity}
-                </p>
-              </div>
-              <p className="text-gray-800 font-semibold">
-                ${item.price * item.quantity}
+              <h2 className="text-xl font-semibold">
+                Order #{order.id}
+              </h2>
+
+              <p>
+                Status:
+                <span
+                  className={
+                    order.status === "PAID"
+                      ? "text-green-600 font-bold ml-2"
+                      : "text-yellow-600 font-bold ml-2"
+                  }
+                >
+                  {order.status}
+                </span>
               </p>
+
+              <p>Total: <span className="font-bold">${order.total_amount}</span></p>
+              <p>Date: {new Date(order.created_at).toLocaleString()}</p>
+
+              <Link
+                to={`/orders/${order.id}`}
+                className="inline-block mt-2 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                View Details
+              </Link>
             </div>
           ))}
-
-          <h2 className="text-2xl font-bold mt-4 text-gray-800">
-            Total: ${total}
-          </h2>
-
-          <button className="w-full bg-cyan-900 text-white py-2 rounded-lg hover:bg-green-600">
-            Pending...
-          </button>
         </div>
       ) : (
-        <p className="text-gray-600">No items in your order.</p>
+        <p className="text-gray-600">No orders yet.</p>
       )}
     </div>
   );

@@ -15,6 +15,7 @@ import Payment from "./components/Payment";
 import Confirmation from "./components/Confirmation";
 import Orders from "./components/Orders";
 import Wishlist from "./components/Wishlist";
+import OrderDetails from "./components/OrderDetails";
 
 function App() {
   return (
@@ -29,12 +30,13 @@ function App() {
         <Route path="/macbook" element={<MacBook />}></Route>
         <Route path="/earpod" element={<AirPod />}></Route>
         <Route path="/payment" element={<Payment />}></Route>
-        <Route path="/payment" element={<Payment />}></Route>
+        {/* <Route path="/payment" element={<Payment />}></Route> */}
         <Route path="/orders" element={<Orders />}></Route>
         <Route path="/confirmation" element={<Confirmation />}></Route>
         <Route path="/product-details" element={<ProductDetails />} />
         <Route path="/admin-home/*" element={<AdminHome />} />
         <Route path="/wishlist" element={<Wishlist />}></Route>
+        <Route path="/orders/:id" element={<OrderDetails />} />
       </Routes>
       <Footer />
     </div>

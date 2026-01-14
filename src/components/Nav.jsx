@@ -47,10 +47,8 @@ function Nav() {
           <li className="hover:text-blue-600 cursor-pointer">
             <Link to="/products">Products</Link>
           </li>
-          <li>
-            <a className="hover:text-blue-600 cursor-pointer relative">
-              <Link to="/wishlist">Wishlist </Link>
-            </a>
+          <li className="hover:text-blue-600 cursor-pointer relative">
+            <Link to="/wishlist">Wishlist</Link>
           </li>
           <li className="hover:text-blue-600 cursor-pointer relative">
             <Link to="/cart">
@@ -61,7 +59,7 @@ function Nav() {
             </Link>
           </li>
           <li className="hover:text-blue-600 cursor-pointer relative">
-            <Link to={"/orders"}>Orders</Link>
+            <Link to={"/orders/"}>Orders</Link>
           </li>
 
           {loggedIn ? (

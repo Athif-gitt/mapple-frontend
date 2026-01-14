@@ -45,6 +45,67 @@ function Cart() {
     0
   );
 
+  // 🚀 RAZORPAY CHECKOUT FLOW
+  const handleCheckout = async () => {
+    const token = localStorage.getItem("access-token");
+
+    try {
+      // Step 1 — Create order on backend
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/orders/create/",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const { order_id, amount, key } = res.data;
+
+      // Step 2 — Load Razorpay script & open popup
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => openRazorpay(order_id, amount, key);
+      document.body.appendChild(script);
+    } catch (error) {
+      console.error(error);
+      alert("Could not create order");
+    }
+  };
+
+  const openRazorpay = (order_id, amount, key) => {
+    const token = localStorage.getItem("access-token");
+
+    const options = {
+      key,
+      amount,
+      currency: "INR",
+      name: "Mapple Store",
+      description: "Cart Payment",
+      order_id,
+      handler: async function (response) {
+        try {
+          await axios.post(
+            "http://127.0.0.1:8000/api/orders/verify/",
+            {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          alert("Payment Successful!");
+          getCart(); // refresh cart items
+        } catch (error) {
+          console.error(error);
+          alert("Payment verification failed");
+        }
+      },
+      theme: { color: "#3399cc" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
   return (
     <div className="p-0 bg-gray-50 min-h-screen">
       <Nav />
@@ -64,13 +125,24 @@ function Cart() {
                   <button onClick={() => updateQuantity(item.id, "inc")}>+</button>
                 </div>
               </div>
-              <button onClick={() => removeItem(item.id)} className="bg-red-600 text-white px-3 py-1 rounded">
+              <button
+                onClick={() => removeItem(item.id)}
+                className="bg-red-600 text-white px-3 py-1 rounded"
+              >
                 Remove
               </button>
             </div>
           ))}
 
           <h2 className="text-2xl font-bold mt-4 text-gray-800">Total: ${total}</h2>
+
+          {/* 💳 BUY ALL BUTTON */}
+          <button
+            onClick={handleCheckout}
+            className="mt-4 px-6 py-3 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
+          >
+            Buy All & Pay 💳
+          </button>
         </div>
       ) : (
         <p>Your cart is empty.</p>
