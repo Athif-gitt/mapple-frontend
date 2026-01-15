@@ -6,6 +6,7 @@ function AdminProducts() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
+
   useEffect(() => {
     const fetchProducts = async () => {
       const token = localStorage.getItem("access-token");
@@ -24,6 +25,26 @@ function AdminProducts() {
 
     fetchProducts();
   }, []);
+
+  const deleteProduct = async (id) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    const token = localStorage.getItem("access-token");
+
+    try {
+      await axios.delete(
+        `http://127.0.0.1:8000/api/products/admin/${id}/`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setProducts(products.filter((p) => p.id !== id));
+      alert("Product deleted!");
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Delete failed");
+    }
+  };
+
 
   return (
     <div className="p-4 bg-white rounded shadow">
@@ -59,11 +80,15 @@ function AdminProducts() {
               <td className="p-2">₹{product.price}</td>
               <td className="p-2">{product.stock ?? "—"}</td>
               <td className="p-2 text-right space-x-3">
-                <button className="text-blue-600 hover:underline">View</button>
+                <button className="text-blue-600 hover:underline" 
+                onClick={() => navigate(`/admin-home/products/${product.id}`)}>
+                  View</button>
 
-                <button className="text-green-600 hover:underline">Edit</button>
+                {/* <button className="text-green-600 hover:underline">Edit</button> */}
 
-                <button className="text-red-600 hover:underline">Delete</button>
+                <button className="text-red-600 hover:underline" 
+                onClick={() => deleteProduct(product.id)}
+                >Delete</button>
               </td>
             </tr>
           ))}
