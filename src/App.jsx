@@ -16,6 +16,9 @@ import Confirmation from "./components/Confirmation";
 import Orders from "./components/Orders";
 import Wishlist from "./components/Wishlist";
 import OrderDetails from "./components/OrderDetails";
+import AdminUsers from "./Admin/Pages/AdminUsers";
+import UserDetails from "./Admin/Pages/UserDetails";
+import Nav from "./components/Nav";
 
 function App() {
   return (
@@ -37,6 +40,10 @@ function App() {
         <Route path="/admin-home/*" element={<AdminHome />} />
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/orders/:id" element={<OrderDetails />} />
+        {/* <Route path="/admin-home/users/" element={<AdminUsers />} />
+        <Route path="/admin-home/users/" element={<AdminUsers />} />
+        <Route path="/admin-home/users/" element={<AdminUsers />} />
+        <Route path="/admin-home/users/:id" element={<UserDetails />} /> */}
       </Routes>
       <Footer />
     </div>

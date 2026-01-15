@@ -5,15 +5,9 @@ import AdminHeader from "../components/AdminHeader";
 import AdminProducts from "./AdminProducts";
 import AdminUsers from "./AdminUsers";
 import UserDetails from "./UserDetails";
+import NewProduct from "./NewProduct";
 
 function AdminHome() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || user.email !== "admin@gmail.com") {
-      navigate("/login");
-    }
-  }, [navigate]);
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
@@ -26,8 +20,9 @@ function AdminHome() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="users/:id" element={<UserDetails />} />
+            <Route path="new" element={<NewProduct />} />
             <Route
-              path="/admin-home"
+              path="admin-home"
               element={
                 <h2 className="text-xl font-semibold">Welcome Admin, beeen waiting for you!!!</h2> // self coded
               }

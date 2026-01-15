@@ -7,18 +7,33 @@ function UserDetails() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:3010/users/${id}`)
-      .then((res) => setUser(res.data))
-      .catch((err) => console.error(err));
+    const fetchUser = async () => {
+      const token = localStorage.getItem("access-token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get(`http://localhost:8000/api/auth/admin/users/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(res.data);
+      } catch (err) {
+        console.error("Failed to load user", err);
+      }
+    };
+
+    fetchUser();
   }, [id]);
 
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="bg-white shadow p-4 rounded">
-      <h2 className="text-2xl font-bold mb-3">{user.name}</h2>
-      <p>Email: {user.email}</p>
-      <p>Orders: iPhone 15, MacBook Air</p>
+    <div className="p-6 bg-white shadow rounded space-y-3">
+      <h2 className="text-2xl font-semibold">User Details</h2>
+      <p><strong>ID:</strong> {user.id}</p>
+      <p><strong>Username:</strong> {user.username}</p>
+      <p><strong>Email:</strong> {user.email}</p>
+      <p><strong>Is Staff:</strong> {user.is_staff ? "Yes" : "No"}</p>
+      <p><strong>Active:</strong> {user.is_active ? "Yes" : "No"}</p>
     </div>
   );
 }

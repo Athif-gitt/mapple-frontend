@@ -32,35 +32,39 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const validationErrors = validate();
+    e.preventDefault();
+    const validationErrors = validate();
 
-  if (Object.keys(validationErrors).length > 0) {
-    setError(validationErrors);
-    return;
-  }
+    if (Object.keys(validationErrors).length > 0) {
+      setError(validationErrors);
+      return;
+    }
 
-  try {
-    const res = await axios.post(
-      "http://127.0.0.1:8000/api/auth/login/",
-      {
+    try {
+      const res = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
         username: name,
         password: password,
+      });
+
+      // Save token in browser storage
+      localStorage.setItem("access-token", res.data.access);
+      localStorage.setItem("refresh-token", res.data.refresh);
+
+      const userRes = await axios.get("http://127.0.0.1:8000/api/auth/me/", {
+        headers: {
+          Authorization: `Bearer ${res.data.access}`,
+        },
+      });
+      if (userRes.data.is_staff) {
+        window.location.href = "/admin-home/products/"; // Django admin
+      } else {
+        navigate("/"); // customer homepage
       }
-    );
-
-    // Save token in browser storage
-    localStorage.setItem("access-token", res.data.access);
-    localStorage.setItem("refresh-token", res.data.refresh);
-
-    // Redirect after login
-    navigate("/");
-
-  } catch (err) {
-    console.error(err);
-    alert("Invalid username or password");
-  }
-};
+    } catch (err) {
+      console.error(err);
+      alert("Invalid username or password");
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
