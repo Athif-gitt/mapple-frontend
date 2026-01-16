@@ -56,7 +56,7 @@ function Login() {
         },
       });
       if (userRes.data.is_staff) {
-        window.location.href = "/admin-home/products/"; // Django admin
+        window.location.href = "/admin-home/stats/"; // Django admin
       } else {
         navigate("/"); // customer homepage
       }
