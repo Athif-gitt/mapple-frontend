@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import Nav from "../Nav";
 
 function Iphone() {
   const [iphone, setIphone] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3010/products?category=iPhone")
-      .then((res) => setIphone(res.data))
+    api
+      .get("/products/?category=iPhone")
+      .then((res) => setIphone(res.data.results || res.data))
       .catch((err) => console.error(err));
   }, []);
   return (
     <div>
-        <Nav />
+      <Nav />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 mt-6">
         {iphone.map((item) => (
           <div

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 
 function NewProduct() {
@@ -23,18 +23,10 @@ function NewProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("access-token");
-    if (!token) return;
-
     try {
-      await axios.post(
-        "http://127.0.0.1:8000/api/products/admin/",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      await api.post(
+        "/products/admin/",
+        formData
       );
 
       alert("Product created successfully!");

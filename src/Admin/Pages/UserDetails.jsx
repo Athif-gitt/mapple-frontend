@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "@/api/axios";
 
 function UserDetails() {
   const { id } = useParams();
@@ -8,13 +8,8 @@ function UserDetails() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem("access-token");
-      if (!token) return;
-
       try {
-        const res = await axios.get(`http://localhost:8000/api/auth/admin/users/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get(`/auth/admin/users/${id}`);
         setUser(res.data);
       } catch (err) {
         console.error("Failed to load user", err);

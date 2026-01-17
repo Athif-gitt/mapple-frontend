@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 
 function AdminStats() {
   const [stats, setStats] = useState(null);
@@ -8,12 +8,8 @@ function AdminStats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("access-token");
-        const res = await axios.get(
-          "http://127.0.0.1:8000/api/orders/admin/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+        const res = await api.get(
+          "/orders/admin/stats/"
         );
         setStats(res.data);
       } catch (error) {

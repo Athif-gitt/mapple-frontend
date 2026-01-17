@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "@/api/axios";
 import AdminSidebar from "../Components/AdminSidebar";
 
 function AdminUsers() {
@@ -8,18 +8,8 @@ function AdminUsers() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem("access-token");
-      if (!token) {
-        console.error("No token found");
-        return;
-      }
-
       try {
-        const res = await axios.get("http://localhost:8000/api/auth/admin/users/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await api.get("/auth/admin/users/");
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);

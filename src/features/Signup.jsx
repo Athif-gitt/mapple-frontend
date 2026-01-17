@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import Cart from "../components/Cart";
 
@@ -40,37 +40,37 @@ function Signup() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const validationErrors = validate();
+    e.preventDefault();
+    const validationErrors = validate();
 
-  if (Object.keys(validationErrors).length > 0) {
-    setError(validationErrors);
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      "http://127.0.0.1:8000/api/auth/register/",
-      {
-        username: name,
-        email,
-        password,
-      }
-    );
-
-    alert("Account created successfully!");
-    navigate("/login");
-
-  } catch (err) {
-    console.error(err);
-
-    if (err.response?.status === 400) {
-      alert("User already exists or invalid data");
-    } else {
-      alert(err.response.Object);
+    if (Object.keys(validationErrors).length > 0) {
+      setError(validationErrors);
+      return;
     }
-  }
-};
+
+    try {
+      const res = await api.post(
+        "/auth/register/",
+        {
+          username: name,
+          email,
+          password,
+        }
+      );
+
+      alert("Account created successfully!");
+      navigate("/login");
+
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.status === 400) {
+        alert("User already exists or invalid data");
+      } else {
+        alert(err.response.Object);
+      }
+    }
+  };
 
 
   return (

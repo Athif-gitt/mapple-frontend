@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import Nav from "./Nav";
 import { useNavigate } from "react-router-dom";
 
@@ -11,9 +11,7 @@ function Cart() {
     const token = localStorage.getItem("access-token");
     if (!token) return;
 
-    const res = await axios.get("http://127.0.0.1:8000/api/cart/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/cart/");
     setCartItems(res.data.items || []);
   };
 
@@ -22,20 +20,16 @@ function Cart() {
   }, []);
 
   const updateQuantity = async (itemId, type) => {
-    const token = localStorage.getItem("access-token");
-    await axios.patch(
-      `http://127.0.0.1:8000/api/cart/item/${itemId}/`,
-      { action: type },
-      { headers: { Authorization: `Bearer ${token}` } }
+    await api.patch(
+      `/cart/item/${itemId}/`,
+      { action: type }
     );
     getCart();
   };
 
   const removeItem = async (itemId) => {
-    const token = localStorage.getItem("access-token");
-    await axios.delete(
-      `http://127.0.0.1:8000/api/cart/item/${itemId}/`,
-      { headers: { Authorization: `Bearer ${token}` } }
+    await api.delete(
+      `/cart/item/${itemId}/`
     );
     getCart();
   };
@@ -47,14 +41,11 @@ function Cart() {
 
   // 🚀 RAZORPAY CHECKOUT FLOW
   const handleCheckout = async () => {
-    const token = localStorage.getItem("access-token");
-
     try {
       // Step 1 — Create order on backend
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/orders/create/",
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+      const res = await api.post(
+        "/orders/create/",
+        {}
       );
 
       const { order_id, amount, key } = res.data;
@@ -71,7 +62,6 @@ function Cart() {
   };
 
   const openRazorpay = (order_id, amount, key) => {
-    const token = localStorage.getItem("access-token");
 
     const options = {
       key,
@@ -82,14 +72,13 @@ function Cart() {
       order_id,
       handler: async function (response) {
         try {
-          await axios.post(
-            "http://127.0.0.1:8000/api/orders/verify/",
+          await api.post(
+            "/orders/verify/",
             {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
+            }
           );
 
           alert("Payment Successful!");

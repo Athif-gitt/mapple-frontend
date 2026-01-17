@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 
 function ProductForm({ setProducts }) {
   const [form, setForm] = useState({ name: "", price: "", category: "" });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:3010/products", form)
+    api.post("/products/admin/", form)
       .then((res) => {
         setProducts((prev) => [...prev, res.data]);
         setForm({ name: "", price: "", category: "" });

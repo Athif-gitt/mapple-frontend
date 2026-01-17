@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Nav from "./Nav";
 
@@ -18,14 +18,12 @@ function Products() {
     const token = localStorage.getItem("access-token");
     if (!token) return;
 
-    let url = `http://127.0.0.1:8000/api/products/?page=${page}`;
+    let url = `/products/?page=${page}`;
 
     if (category) url += `&category=${category}`;
     if (search) url += `&search=${search}`;
 
-    const res = await axios.get(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get(url);
 
     setProducts(res.data.results);
     setCurrentPage(page);
@@ -41,11 +39,9 @@ function Products() {
   };
 
   const handleAddToCart = async (item) => {
-    const token = localStorage.getItem("access-token");
-    await axios.post(
-      "http://127.0.0.1:8000/api/cart/",
-      { product_id: item.id },
-      { headers: { Authorization: `Bearer ${token}` } }
+    await api.post(
+      "/cart/",
+      { product_id: item.id }
     );
     navigate("/cart");
   };
@@ -53,11 +49,9 @@ function Products() {
   const pageNumbers = [...Array(totalPages).keys()].map((n) => n + 1);
 
   const handleAddToWishlist = async (item) => {
-    const token = localStorage.getItem("access-token");
-    await axios.post(
-      "http://127.0.0.1:8000/api/wishlist/",
-      { product_id: item.id },
-      { headers: { Authorization: `Bearer ${token}` } }
+    await api.post(
+      "/wishlist/",
+      { product_id: item.id }
     );
     alert("Added to Wishlst 👍");
   };
@@ -155,11 +149,10 @@ function Products() {
           <button
             key={num}
             onClick={() => fetchProducts(num)}
-            className={`px-3 py-2 rounded ${
-              num === currentPage
+            className={`px-3 py-2 rounded ${num === currentPage
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 hover:bg-gray-300"
-            }`}
+              }`}
           >
             {num}
           </button>

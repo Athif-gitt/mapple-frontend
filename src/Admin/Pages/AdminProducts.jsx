@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 
 function AdminProducts() {
@@ -9,13 +9,9 @@ function AdminProducts() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const token = localStorage.getItem("access-token");
       try {
-        const res = await axios.get(
-          "http://127.0.0.1:8000/api/products/admin/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+        const res = await api.get(
+          "/products/admin/"
         );
         setProducts(res.data);
       } catch (err) {
@@ -29,12 +25,9 @@ function AdminProducts() {
   const deleteProduct = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
-    const token = localStorage.getItem("access-token");
-
     try {
-      await axios.delete(
-        `http://127.0.0.1:8000/api/products/admin/${id}/`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.delete(
+        `/products/admin/${id}/`
       );
 
       setProducts(products.filter((p) => p.id !== id));
@@ -80,14 +73,14 @@ function AdminProducts() {
               <td className="p-2">₹{product.price}</td>
               <td className="p-2">{product.stock ?? "—"}</td>
               <td className="p-2 text-right space-x-3">
-                <button className="text-blue-600 hover:underline" 
-                onClick={() => navigate(`/admin-home/products/${product.id}`)}>
+                <button className="text-blue-600 hover:underline"
+                  onClick={() => navigate(`/admin-home/products/${product.id}`)}>
                   View</button>
 
                 {/* <button className="text-green-600 hover:underline">Edit</button> */}
 
-                <button className="text-red-600 hover:underline" 
-                onClick={() => deleteProduct(product.id)}
+                <button className="text-red-600 hover:underline"
+                  onClick={() => deleteProduct(product.id)}
                 >Delete</button>
               </td>
             </tr>

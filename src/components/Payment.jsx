@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Payment() {
@@ -33,15 +33,15 @@ export default function Payment() {
         return;
       }
 
-      const res = await axios.get(
-        `http://localhost:3010/users/${loggedUser.id}`
+      const res = await api.get(
+        `/users/${loggedUser.id}`
       );
       const userData = res.data;
-      const resPatch = await axios.patch(
-        `http://localhost:3010/users/${userData.id}`,
+      const resPatch = await api.patch(
+        `/users/${userData.id}`,
         { purchase: userData.cart }
       );
-      console.log(resPatch.data); 
+      console.log(resPatch.data);
 
       navigate("/confirmation", { state: { order: userData.cart } });
 

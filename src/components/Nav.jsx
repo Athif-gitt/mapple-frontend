@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "@/api/axios";
 
 function Nav() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -17,9 +17,7 @@ function Nav() {
       setLoggedIn(true);
 
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/cart/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/cart/");
 
         const items = res.data.items || [];
         const totalQuantity = items.reduce(

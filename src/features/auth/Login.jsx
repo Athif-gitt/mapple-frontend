@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -41,7 +41,7 @@ function Login() {
     }
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
+      const res = await api.post("/auth/login/", {
         username: name,
         password: password,
       });
@@ -50,11 +50,7 @@ function Login() {
       localStorage.setItem("access-token", res.data.access);
       localStorage.setItem("refresh-token", res.data.refresh);
 
-      const userRes = await axios.get("http://127.0.0.1:8000/api/auth/me/", {
-        headers: {
-          Authorization: `Bearer ${res.data.access}`,
-        },
-      });
+      const userRes = await api.get("/auth/me/");
       if (userRes.data.is_staff) {
         window.location.href = "/admin-home/stats/"; // Django admin
       } else {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 
 function ProductDetails() {
@@ -9,13 +9,9 @@ function ProductDetails() {
 
   useEffect(() => {
     const fetchItem = async () => {
-      const token = localStorage.getItem("access-token");
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/products/admin/${id}/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+        const response = await api.get(
+          `/products/admin/${id}/`
         );
         setProduct(response.data);
       } catch (error) {

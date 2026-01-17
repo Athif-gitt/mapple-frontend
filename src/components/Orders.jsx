@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { Link } from "react-router-dom";
 import Nav from "./Nav";
 
@@ -12,9 +12,8 @@ export default function Orders() {
       if (!token) return;
 
       try {
-        const res = await axios.get(
-          "http://127.0.0.1:8000/api/orders/",
-          { headers: { Authorization: `Bearer ${token}` } }
+        const res = await api.get(
+          "/orders/"
         );
 
         console.log("Orders fetched:", res.data);

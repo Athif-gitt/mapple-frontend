@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import Nav from "./Nav";
 import { useNavigate } from "react-router-dom";
 
@@ -11,9 +11,7 @@ function Wishlist() {
     const token = localStorage.getItem("access-token");
     if (!token) return;
 
-    const res = await axios.get("http://127.0.0.1:8000/api/wishlist/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/wishlist/");
     setItems(res.data || []);
   };
 
@@ -22,11 +20,8 @@ function Wishlist() {
   }, []);
 
   const removeItem = async (itemId) => {
-    const token = localStorage.getItem("access-token");
-    await axios.delete(
-      `http://127.0.0.1:8000/api/wishlist/item/${itemId}/`,
-      
-      { headers: { Authorization: `Bearer ${token}` } }
+    await api.delete(
+      `/wishlist/item/${itemId}/`
     );
     getWishlist();
   };

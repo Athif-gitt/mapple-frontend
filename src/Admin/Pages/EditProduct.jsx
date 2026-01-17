@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 
 function EditProduct() {
@@ -19,11 +19,9 @@ function EditProduct() {
   // Fetch existing product data
   useEffect(() => {
     const fetchProduct = async () => {
-      const token = localStorage.getItem("access-token");
       try {
-        const res = await axios.get(
-          `http://127.0.0.1:8000/api/products/admin/${id}/`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        const res = await api.get(
+          `/products/admin/${id}/`
         );
         setFormData(res.data);
         setLoading(false);
@@ -41,13 +39,11 @@ function EditProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("access-token");
 
     try {
-      await axios.put(
-        `http://127.0.0.1:8000/api/products/admin/${id}/`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.put(
+        `/products/admin/${id}/`,
+        formData
       );
 
       alert("Product updated successfully!");

@@ -10,6 +10,9 @@ function AdminSidebar() {
           <Link to="/admin-home/stats" className="hover:text-blue-600">Analytics</Link>
         </li>
         <li>
+          <Link to="/admin-home/orders" className="hover:text-blue-600">Orders</Link>
+        </li>
+        <li>
           <Link to="/admin-home/products" className="hover:text-blue-600">Products</Link>
         </li>
         <li>

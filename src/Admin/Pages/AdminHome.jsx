@@ -9,6 +9,8 @@ import NewProduct from "./NewProduct";
 import ProductDetails from "./ProductDetails";
 import EditProduct from "./EditProduct";
 import AdminStats from "./AdminStats";
+import AdminOrders from "./AdminOrders";
+import AdminOrderDetail from "./AdminOrderDetail";
 
 function AdminHome() {
   return (
@@ -27,10 +29,14 @@ function AdminHome() {
             <Route path="products/:id" element={<ProductDetails />} />
             <Route path="products/:id/edit" element={<EditProduct />} />
             <Route path="stats/" element={<AdminStats />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="orders/:id" element={<AdminOrderDetail />} />
             <Route
               path="admin-home"
               element={
-                <h2 className="text-xl font-semibold">Welcome Admin, beeen waiting for you!!!</h2> // self coded
+                <h2 className="text-xl font-semibold">
+                  Welcome Admin, beeen waiting for you!!!
+                </h2> // self coded
               }
             />
           </Routes>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "@/api/axios";
 import Nav from "./Nav";
 
 export default function OrderDetails() {
@@ -9,10 +9,8 @@ export default function OrderDetails() {
 
   useEffect(() => {
     const fetchOrder = async () => {
-      const token = localStorage.getItem("access-token");
-      const res = await axios.get(
-        `http://127.0.0.1:8000/api/orders/${id}/`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const res = await api.get(
+        `/orders/${id}/`
       );
       setOrder(res.data);
     };
