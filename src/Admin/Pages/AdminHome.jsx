@@ -11,10 +11,11 @@ import EditProduct from "./EditProduct";
 import AdminStats from "./AdminStats";
 import AdminOrders from "./AdminOrders";
 import AdminOrderDetail from "./AdminOrderDetail";
+import "../admin.css";
 
 function AdminHome() {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div id="admin-root" className="flex min-h-screen">
       <AdminSidebar />
 
       <div className="flex-1 flex flex-col">

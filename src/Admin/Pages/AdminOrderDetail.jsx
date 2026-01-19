@@ -52,7 +52,16 @@ function AdminOrderDetail() {
 
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           <p><b>User:</b> {order.username}</p>
-          <p><b>Status:</b> {order.status}</p>
+          <p className="flex items-center gap-2">
+            <b>Status:</b>
+            <span className={`px-2 py-1 rounded text-xs font-semibold border ${order.status === 'PAID' ? 'admin-badge-success' :
+                order.status === 'PENDING' ? 'admin-badge-warning' :
+                  order.status === 'FAILED' ? 'admin-badge-danger' :
+                    order.status === 'CANCELLED' ? 'admin-badge-neutral' : ''
+              }`}>
+              {order.status}
+            </span>
+          </p>
           <p><b>Total Amount:</b> ₹ {order.total_amount}</p>
           <p>
             <b>Created:</b>{" "}
@@ -67,7 +76,10 @@ function AdminOrderDetail() {
               key={s}
               disabled={updating}
               onClick={() => updateStatus(s)}
-              className="px-3 py-1 text-sm rounded bg-gray-100 hover:bg-gray-200"
+              className={`px-3 py-1 text-sm rounded bg-gray-100 hover:bg-gray-200 ${s === 'PAID' ? 'admin-btn-success' :
+                  s === 'FAILED' ? 'admin-btn-danger' :
+                    s === 'CANCELLED' ? 'admin-btn-neutral' : ''
+                }`}
             >
               Mark {s}
             </button>

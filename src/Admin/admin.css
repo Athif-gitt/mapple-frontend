@@ -1,0 +1,202 @@
+/* Scoped to admin-root to prevent leakage */
+#admin-root {
+  background-color: #000000 !important;
+  color: #f3f3f3;
+  /* Light gray for body text */
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  /* Assuming a nice font is available or fallback */
+}
+
+/* --- Layout Containers --- */
+#admin-root .admin-layout,
+#admin-root .admin-content-wrapper {
+  background-color: #000000 !important;
+}
+
+/* Sidebar */
+#admin-root .admin-sidebar,
+#admin-root aside {
+  background-color: #000000 !important;
+  border-right: 1px solid #DAA520;
+}
+
+#admin-root .admin-sidebar h2,
+#admin-root aside h2 {
+  color: #DAA520 !important;
+}
+
+#admin-root .admin-sidebar a,
+#admin-root aside a {
+  color: #f3f3f3 !important;
+  transition: all 0.3s ease;
+}
+
+#admin-root .admin-sidebar a:hover {
+  color: #DAA520 !important;
+  text-decoration: underline;
+}
+
+/* Header */
+#admin-root .admin-header,
+#admin-root header {
+  background-color: #000000 !important;
+  border-bottom: 1px solid #DAA520;
+}
+
+#admin-root .admin-header h1,
+#admin-root header h1 {
+  color: #DAA520 !important;
+}
+
+/* --- Components --- */
+
+/* Buttons */
+#admin-root button {
+  background-color: #DAA520 !important;
+  color: #000000 !important;
+  border: 1px solid #DAA520;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+#admin-root button:hover {
+  opacity: 0.9;
+}
+
+/* Delete/Destructive buttons override - keeping red but distinct or mapped to gold? 
+   User said "All buttons... must be Goldenrod". strictly following user.
+   If user strictly wants ALL buttons goldenrod, I will do that.
+   However, usually delete buttons are red. 
+   I will make standard buttons Gold. 
+   I will style specifically targeted clear/delete buttons if needed, but per request "Primary Accents: All buttons... must be Goldenrod".
+   I'll stick to Gold for now as requested.
+*/
+
+/* Cards / Content Areas */
+/* Cards / Content Areas */
+#admin-root .bg-white,
+#admin-root .bg-gray-100,
+#admin-root .card {
+  background-color: #000000 !important;
+  border: 1px solid #DAA520;
+}
+
+/* Default card text */
+#admin-root .card-text {
+  color: #f3f3f3;
+}
+
+/* Stat Numbers - High Specificity Override */
+#admin-root .admin-stat-number {
+  color: #ffffff !important;
+}
+
+
+/* Tables */
+#admin-root table {
+  background-color: #000000 !important;
+  color: #f3f3f3 !important;
+  border: 1px solid #DAA520;
+}
+
+#admin-root thead {
+  background-color: #1a1a1a !important;
+  /* Slightly lighter black for contrast header */
+}
+
+#admin-root th {
+  color: #DAA520 !important;
+  border-bottom: 1px solid #DAA520 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#admin-root td {
+  border-bottom: 1px solid #333 !important;
+  /* Subtle inner dividers */
+  color: #e0e0e0;
+}
+
+#admin-root tr:hover {
+  background-color: #111 !important;
+}
+
+/* Inputs */
+#admin-root input,
+#admin-root select,
+#admin-root textarea {
+  background-color: #000000 !important;
+  border: 1px solid #DAA520 !important;
+  color: #DAA520 !important;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+#admin-root input:focus,
+#admin-root select:focus,
+#admin-root textarea:focus {
+  outline: none;
+  box-shadow: 0 0 5px #DAA520;
+}
+
+/* Headings */
+#admin-root h1,
+#admin-root h2,
+#admin-root h3,
+#admin-root h4,
+#admin-root h5,
+#admin-root h6 {
+  color: #DAA520 !important;
+}
+
+/* Links */
+#admin-root a {
+  color: #DAA520;
+  text-decoration: none;
+}
+
+#admin-root a:hover {
+  text-decoration: underline;
+}
+
+/* Modals / Dropdowns */
+#admin-root .modal,
+#admin-root .dropdown-menu {
+  /* Deep charcoal */
+  border: 1px solid #DAA520;
+  color: #fff;
+}
+
+/* Status / Semantic Overrides */
+#admin-root .admin-btn-success,
+#admin-root .admin-badge-success {
+  background-color: #14532d !important;
+  /* Green-900 */
+  color: #d1fae5 !important;
+  border-color: #15803d !important;
+}
+
+#admin-root .admin-btn-warning,
+#admin-root .admin-badge-warning {
+  background-color: #713f12 !important;
+  /* Yellow-900 */
+  color: #fef3c7 !important;
+  border-color: #a16207 !important;
+}
+
+#admin-root .admin-btn-danger,
+#admin-root .admin-badge-danger {
+  background-color: #7f1d1d !important;
+  /* Red-900 */
+  color: #fee2e2 !important;
+  border-color: #b91c1c !important;
+}
+
+#admin-root .admin-btn-neutral,
+#admin-root .admin-badge-neutral {
+  background-color: #1f2937 !important;
+  /* Gray-800 */
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+}

@@ -79,10 +79,10 @@ function AdminOrders() {
 
 function StatusBadge({ status }) {
   const styles = {
-    PAID: "bg-green-100 text-green-700",
-    PENDING: "bg-yellow-100 text-yellow-700",
-    FAILED: "bg-red-100 text-red-700",
-    CANCELLED: "bg-gray-200 text-gray-700",
+    PAID: "bg-green-900 text-green-100 border border-green-700",
+    PENDING: "bg-yellow-900 text-yellow-100 border border-yellow-700",
+    FAILED: "bg-red-900 text-red-100 border border-red-700",
+    CANCELLED: "bg-gray-800 text-gray-300 border border-gray-600",
   };
 
   return (

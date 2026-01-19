@@ -32,7 +32,7 @@ function AdminStats() {
 
   return (
     <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold text-gray-800">
+      <h1 className="text-3xl font-bold text-white">
         📈 Admin Analytics Dashboard
       </h1>
 
@@ -77,7 +77,7 @@ function StatCard({ title, value, emoji }) {
         <h2 className="text-lg font-semibold text-gray-700">{title}</h2>
         <span className="text-2xl">{emoji}</span>
       </div>
-      <p className="text-3xl font-bold mt-3 text-gray-900">{value}</p>
+      <p className="text-3xl font-bold mt-3 text-white admin-stat-number">{value}</p>
     </div>
   );
 }

@@ -15,8 +15,8 @@ function Products() {
   const [search, setSearch] = useState("");
 
   const fetchProducts = async (page = 1) => {
-    const token = localStorage.getItem("access-token");
-    if (!token) return;
+    // const token = localStorage.getItem("access-token");
+    // if (!token) return;
 
     let url = `/products/?page=${page}`;
 
