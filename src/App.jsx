@@ -19,10 +19,12 @@ import OrderDetails from "./components/OrderDetails";
 import AdminUsers from "./Admin/Pages/AdminUsers";
 import UserDetails from "./Admin/Pages/UserDetails";
 import Nav from "./components/Nav";
+import ScrollToTop from "./utils/ScrollToTop";
 
 function App() {
   return (
     <div>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -39,7 +41,7 @@ function App() {
         {/* <Route path="/payment" element={<Payment />}></Route> */}
         <Route path="/orders" element={<Orders />}></Route>
         <Route path="/confirmation" element={<Confirmation />}></Route>
-        <Route path="/product-details" element={<ProductDetails />} />
+        <Route path="/products/:id/" element={<ProductDetails />} />
         <Route path="/admin-home/*" element={<AdminHome />} />
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/orders/:id" element={<OrderDetails />} />

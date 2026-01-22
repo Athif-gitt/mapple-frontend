@@ -14,29 +14,43 @@ function Products({ categoryProp }) {
   const category = categoryProp || params.get("category");
   const [search, setSearch] = useState("");
 
+  const fetchWishlistIds = async () => {
+  try {
+    const res = await api.get("/wishlist/");
+    return res.data.map((item) => item.product.id);
+  } catch {
+    return [];
+  }
+};
+
+
   const fetchProducts = async (page = 1) => {
-    // const token = localStorage.getItem("access-token");
-    // if (!token) return;
+  let url = `/products/?page=${page}`;
+  if (category) url += `&category=${category}`;
+  if (search) url += `&search=${search}`;
 
-    let url = `/products/?page=${page}`;
+  const [productsRes, wishlistIds] = await Promise.all([
+    api.get(url),
+    fetchWishlistIds(),
+  ]);
 
-    if (category) url += `&category=${category}`;
-    if (search) url += `&search=${search}`;
+  const productsWithWishlist = productsRes.data.results.map((p) => ({
+    ...p,
+    wishlisted: wishlistIds.includes(p.id),
+  }));
 
-    const res = await api.get(url);
+  setProducts(productsWithWishlist);
+  setCurrentPage(page);
+  setTotalPages(Math.ceil(productsRes.data.count / 1));
+};
 
-    setProducts(res.data.results);
-    setCurrentPage(page);
-    setTotalPages(Math.ceil(res.data.count / 1)); // 1 is PAGE_SIZE
-  };
 
   useEffect(() => {
     fetchProducts(1);
   }, [category, search]);
 
   const handleCardClick = (item) => {
-    navigate("/product-details", { state: item });
-  };
+navigate(`/products/${item.id}`, { state: item });  };
 
   const handleAddToCart = async (item) => {
     await api.post(
@@ -48,13 +62,38 @@ function Products({ categoryProp }) {
 
   const pageNumbers = [...Array(totalPages).keys()].map((n) => n + 1);
 
-  const handleAddToWishlist = async (item) => {
-    await api.post(
-      "/wishlist/",
-      { product_id: item.id }
+  const handleToggleWishlist = async (item) => {
+  const token = localStorage.getItem("access-token");
+
+  if (!token) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
+
+  try {
+    if (item.wishlisted) {
+      // remove from wishlist
+      await api.delete(`/wishlist/item/${item.id}/`);
+    } else {
+      // add to wishlist
+      await api.post("/wishlist/", { product_id: item.id });
+    }
+
+    // 🔴 THIS IS WHAT MAKES THE HEART TOGGLE
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === item.id
+          ? { ...p, wishlisted: !p.wishlisted }
+          : p
+      )
     );
-    alert("Added to Wishlst 👍");
-  };
+  } catch (err) {
+    console.error("Wishlist toggle failed:", err);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -114,16 +153,34 @@ function Products({ categoryProp }) {
               >
                 {/* Wishlist Button */}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToWishlist(item);
-                  }}
-                  className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill={item.wishlisted ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                  </svg>
-                </button>
+  onClick={(e) => {
+    e.stopPropagation();
+    handleToggleWishlist(item);
+  }}
+  className={`absolute top-4 right-4 z-10 p-2 rounded-full shadow-sm backdrop-blur-sm transition-all transform hover:scale-110
+    ${
+      item.wishlisted
+        ? "bg-red-50 text-red-500"
+        : "bg-white/80 text-slate-400 hover:text-red-500"
+    }
+  `}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill={item.wishlisted ? "currentColor" : "none"}
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="w-5 h-5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+    />
+  </svg>
+</button>
+
 
                 {/* Image Container */}
                 <div className="relative overflow-hidden aspect-[4/3] bg-slate-50 flex items-center justify-center p-6">
