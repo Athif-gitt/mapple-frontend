@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/api/axios";
 import { loadRazorpay } from "@/utils/razorpay";
+import { formatCurrency } from "../utils/currency";
 
 export default function Payment() {
 
@@ -116,8 +117,8 @@ export default function Payment() {
   if (!order) {
     return <div className="p-10 text-center">Preparing payment…</div>;
   }
-//   console.log("Checkout type:", type);
-// console.log("Product ID:", productId);
+  //   console.log("Checkout type:", type);
+  // console.log("Product ID:", productId);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
@@ -189,7 +190,7 @@ export default function Payment() {
         <div className="flex justify-between text-slate-700 font-semibold">
           <span>Total Amount</span>
           <span className="text-indigo-600">
-            ₹{order.amount / 100}
+            {formatCurrency(order.amount / 100)}
           </span>
         </div>
 
@@ -197,7 +198,7 @@ export default function Payment() {
         <button
           onClick={handlePayment}
           disabled={loading}
-          className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:bg-slate-400"
+          className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:bg-slate-400 cursor-pointer"
         >
           {loading ? "Processing..." : "Pay Securely"}
         </button>

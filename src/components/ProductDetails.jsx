@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import api from "@/api/axios";
+import { formatCurrency } from "../utils/currency";
 import Nav from "./Nav";
 
 export default function ProductDetails() {
@@ -78,7 +79,7 @@ export default function ProductDetails() {
 
               <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
               <p className="text-3xl font-bold text-indigo-600 mb-6">
-                ${product.price}
+                {formatCurrency(product.price)}
               </p>
 
               <p className="text-slate-500 mb-10">{product.description}</p>
@@ -86,14 +87,14 @@ export default function ProductDetails() {
               <div className="flex gap-4 mt-auto">
                 <button
                   onClick={handleBuyNow}
-                  className="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700"
+                  className="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 cursor-pointer"
                 >
                   Buy Now
                 </button>
 
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 border-2 border-slate-200 py-4 rounded-xl font-bold hover:border-indigo-600"
+                  className="flex-1 border-2 border-slate-200 py-4 rounded-xl font-bold hover:border-indigo-600 cursor-pointer"
                 >
                   Add to Cart
                 </button>

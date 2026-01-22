@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "@/api/axios";
 import Nav from "../Nav";
+import { formatCurrency } from "../../utils/currency";
 
 function MacBook() {
   const [macBook, setMacBook] = useState([]);
@@ -29,10 +30,10 @@ function MacBook() {
               {item.name}
             </h3>
             <p className="text-gray-500 text-sm">{item.description}</p>
-            <p className="text-blue-600 font-bold mt-2">${item.price}</p>
+            <p className="text-blue-600 font-bold mt-2">{formatCurrency(item.price)}</p>
             <button
               onClick={() => handleAddToCart(item)}
-              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full"
+              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full cursor-pointer"
             >
               Add to Cart
             </button>

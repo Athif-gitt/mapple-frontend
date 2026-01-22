@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/api/axios";
+import { formatCurrency } from "../utils/currency";
 import Nav from "./Nav";
 
 export default function OrderDetails() {
@@ -43,7 +44,7 @@ export default function OrderDetails() {
           <h2 className="text-2xl font-bold mb-2">Order not found</h2>
           <button
             onClick={() => navigate("/orders")}
-            className="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold"
+            className="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold cursor-pointer"
           >
             Back to Orders
           </button>
@@ -75,10 +76,9 @@ export default function OrderDetails() {
 
           <span
             className={`inline-block px-5 py-2 rounded-full text-sm font-semibold
-              ${
-                order.status === "PAID"
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "bg-amber-50 text-amber-700"
+              ${order.status === "PAID"
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-amber-50 text-amber-700"
               }`}
           >
             {order.status}
@@ -90,7 +90,7 @@ export default function OrderDetails() {
           <div>
             <p className="text-sm text-slate-500 mb-1">Order Total</p>
             <p className="text-2xl font-bold text-slate-900">
-              ${order.total_amount}
+              {formatCurrency(order.total_amount)}
             </p>
           </div>
 
@@ -130,13 +130,13 @@ export default function OrderDetails() {
                     {item.product.name}
                   </h3>
                   <p className="text-sm text-slate-500 mt-1">
-                    ${item.price} × {item.quantity}
+                    {formatCurrency(item.price)} × {item.quantity}
                   </p>
                 </div>
 
                 <div className="text-right">
                   <p className="font-bold text-slate-900">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatCurrency(item.price * item.quantity)}
                   </p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function OrderDetails() {
         <div className="pt-6">
           <button
             onClick={() => navigate("/orders")}
-            className="px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-indigo-600 transition"
+            className="px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-indigo-600 transition cursor-pointer"
           >
             ← Back to Orders
           </button>

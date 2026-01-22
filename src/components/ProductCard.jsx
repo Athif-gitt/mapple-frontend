@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { formatCurrency } from "../utils/currency";
 
 function ProductCard({ image, name, description, price, link }) {
     return (
         <Link
             to={link || "#"}
-            className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden flex flex-col"
+            className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden flex flex-col cursor-pointer"
         >
             <div className="relative overflow-hidden aspect-[4/3] bg-slate-50 flex items-center justify-center p-6">
                 <img
@@ -27,9 +28,9 @@ function ProductCard({ image, name, description, price, link }) {
                 <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
                     <div className="flex flex-col">
                         <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Starting at</span>
-                        <span className="text-lg font-bold text-slate-900">${price}</span>
+                        <span className="text-lg font-bold text-slate-900">{formatCurrency(price)}</span>
                     </div>
-                    <span className="bg-indigo-50 text-indigo-600 rounded-full px-4 py-2 text-sm font-semibold group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                    <span className="bg-indigo-50 text-indigo-600 rounded-full px-4 py-2 text-sm font-semibold group-hover:bg-indigo-600 group-hover:text-white transition-all cursor-pointer">
                         Buy Now
                     </span>
                 </div>

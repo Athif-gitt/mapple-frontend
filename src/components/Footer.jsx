@@ -16,9 +16,9 @@ function Footer() {
         <div>
           <h4 className="font-bold text-slate-800 mb-4">Shop</h4>
           <ul className="space-y-2">
-            <li><Link to="/products" className="hover:text-indigo-600 transition-colors">All Products</Link></li>
-            <li><Link to="/wishlist" className="hover:text-indigo-600 transition-colors">Wishlist</Link></li>
-            <li><Link to="/cart" className="hover:text-indigo-600 transition-colors">Cart</Link></li>
+            <li><Link to="/products" className="hover:text-indigo-600 transition-colors cursor-pointer">All Products</Link></li>
+            <li><Link to="/wishlist" className="hover:text-indigo-600 transition-colors cursor-pointer">Wishlist</Link></li>
+            <li><Link to="/cart" className="hover:text-indigo-600 transition-colors cursor-pointer">Cart</Link></li>
           </ul>
         </div>
 
@@ -26,9 +26,9 @@ function Footer() {
         <div>
           <h4 className="font-bold text-slate-800 mb-4">Support</h4>
           <ul className="space-y-2">
-            <li><a href="#" className="hover:text-indigo-600 transition-colors">Contact Us</a></li>
-            <li><a href="#" className="hover:text-indigo-600 transition-colors">FAQs</a></li>
-            <li><a href="#" className="hover:text-indigo-600 transition-colors">Returns</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors cursor-pointer">Contact Us</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors cursor-pointer">FAQs</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors cursor-pointer">Returns</a></li>
           </ul>
         </div>
       </div>
@@ -37,9 +37,9 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
         <p>&copy; {new Date().getFullYear()} Mapple. All rights reserved.</p>
         <div className="flex space-x-6 mt-4 md:mt-0">
-          <a href="#" className="hover:text-indigo-600 transition-colors">Facebook</a>
-          <a href="#" className="hover:text-indigo-600 transition-colors">Twitter</a>
-          <a href="#" className="hover:text-indigo-600 transition-colors">Instagram</a>
+          <a href="#" className="hover:text-indigo-600 transition-colors cursor-pointer">Facebook</a>
+          <a href="#" className="hover:text-indigo-600 transition-colors cursor-pointer">Twitter</a>
+          <a href="#" className="hover:text-indigo-600 transition-colors cursor-pointer">Instagram</a>
         </div>
       </div>
     </footer>

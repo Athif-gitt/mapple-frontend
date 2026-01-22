@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { formatCurrency } from "../utils/currency";
 
 export default function Confirmation() {
   const location = useLocation();
@@ -26,7 +27,7 @@ export default function Confirmation() {
                 className="border-b pb-2 flex justify-between text-gray-800"
               >
                 <span>{item.name} (x{item.quantity})</span>
-                <span className="font-semibold">${item.price * item.quantity}</span>
+                <span className="font-semibold">{formatCurrency(item.price * item.quantity)}</span>
               </li>
             ))}
           </ul>

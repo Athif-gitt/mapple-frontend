@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "@/api/axios";
+import { formatCurrency } from "../utils/currency";
 import Nav from "./Nav";
 import { useNavigate } from "react-router-dom";
 
@@ -40,7 +41,7 @@ function Wishlist() {
           </h1>
           <button
             onClick={() => navigate("/products")}
-            className="text-indigo-600 font-semibold hover:text-indigo-700"
+            className="text-indigo-600 font-semibold hover:text-indigo-700 cursor-pointer"
           >
             Continue Shopping →
           </button>
@@ -63,7 +64,7 @@ function Wishlist() {
             </p>
             <button
               onClick={() => navigate("/products")}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition"
+              className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition cursor-pointer"
             >
               Browse Products
             </button>
@@ -94,7 +95,7 @@ function Wishlist() {
                   </h2>
 
                   <p className="text-slate-600 mb-4">
-                    ${item.product.price}
+                    {formatCurrency(item.product.price)}
                   </p>
 
                   <div className="flex items-center justify-between">
@@ -102,14 +103,14 @@ function Wishlist() {
                       onClick={() =>
                         navigate(`/products/${item.product.id}`)
                       }
-                      className="text-indigo-600 font-semibold hover:text-indigo-700 hover:cursor-pointer"
+                      className="text-indigo-600 font-semibold hover:text-indigo-700 cursor-pointer"
                     >
                       View Product
                     </button>
 
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:text-red-600 font-medium hover: cursor-pointer"
+                      className="text-red-500 hover:text-red-600 font-medium cursor-pointer"
                     >
                       Remove
                     </button>

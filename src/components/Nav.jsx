@@ -38,7 +38,7 @@ function Nav() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <nav className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group cursor-pointer">
           <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
             Mapple
           </span>
@@ -48,22 +48,22 @@ function Nav() {
         {/* Desktop Navigation */}
         <ul className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-600">
           <li>
-            <Link to="/" className="hover:text-indigo-600 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-indigo-600 transition-colors cursor-pointer">Home</Link>
           </li>
           <li>
-            <Link to="/products" className="hover:text-indigo-600 transition-colors">Products</Link>
+            <Link to="/products" className="hover:text-indigo-600 transition-colors cursor-pointer">Products</Link>
           </li>
           <li>
-            <Link to="/wishlist" className="hover:text-indigo-600 transition-colors">Wishlist</Link>
+            <Link to="/wishlist" className="hover:text-indigo-600 transition-colors cursor-pointer">Wishlist</Link>
           </li>
           <li>
-            <Link to="/orders" className="hover:text-indigo-600 transition-colors">Orders</Link>
+            <Link to="/orders" className="hover:text-indigo-600 transition-colors cursor-pointer">Orders</Link>
           </li>
         </ul>
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-6">
-          <Link to="/cart" className="relative group p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <Link to="/cart" className="relative group p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-700 group-hover:text-indigo-600">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
             </svg>
@@ -81,14 +81,14 @@ function Nav() {
                 localStorage.removeItem("refresh-token");
                 setLoggedIn(false);
               }}
-              className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+              className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors cursor-pointer"
             >
               Logout
             </button>
           ) : (
             <Link
               to="/login"
-              className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
+              className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200 cursor-pointer"
             >
               Login
             </Link>

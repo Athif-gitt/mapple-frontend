@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "@/api/axios";
 import { Link } from "react-router-dom";
+import { formatCurrency } from "../utils/currency";
 import Nav from "./Nav";
 
 export default function Orders() {
@@ -63,7 +64,7 @@ export default function Orders() {
                     </p>
 
                     <p className="text-lg font-semibold text-slate-900">
-                      ${order.total_amount}
+                      {formatCurrency(order.total_amount)}
                     </p>
 
                     <p className="text-sm text-slate-500 mt-1">
@@ -80,10 +81,9 @@ export default function Orders() {
                   <div className="flex items-center gap-3">
                     <span
                       className={`px-4 py-1.5 rounded-full text-sm font-semibold
-                        ${
-                          order.status === "PAID"
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-amber-50 text-amber-700"
+                        ${order.status === "PAID"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-amber-50 text-amber-700"
                         }`}
                     >
                       {order.status}
@@ -91,7 +91,7 @@ export default function Orders() {
 
                     <Link
                       to={`/orders/${order.id}`}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-indigo-600 transition-colors"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-indigo-600 transition-colors cursor-pointer"
                     >
                       View Details →
                     </Link>
@@ -131,7 +131,7 @@ export default function Orders() {
 
             <Link
               to="/products"
-              className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
+              className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors cursor-pointer"
             >
               Start Shopping
             </Link>
