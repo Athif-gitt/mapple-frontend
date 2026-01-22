@@ -1,127 +1,211 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/api/axios";
-import { useNavigate } from "react-router-dom";
+import { loadRazorpay } from "@/utils/razorpay";
 
 export default function Payment() {
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [error, setError] = useState({});
-  const navigate = useNavigate();
 
-  const validate = () => {
-    const newError = {};
-    if (!cardNumber) newError.cardNumberError = "Required";
-    if (!expiry) newError.expiryError = "Required";
-    if (!cvv) newError.cvvError = "Required";
-    return newError;
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { type = "cart", productId } = location.state || {};
+
+  const [loading, setLoading] = useState(false);
+  const [order, setOrder] = useState(null);
+
+  // 🔹 User details state
+  const [details, setDetails] = useState({
+    fullName: "",
+    phone: "",
+    address: "",
+    city: "",
+    pincode: "",
+  });
+
+  const [errors, setErrors] = useState({});
+
+  // 1️⃣ Create order on backend when page loads
+  useEffect(() => {
+    const createOrder = async () => {
+      try {
+        const url =
+          type === "single"
+            ? `/orders/create/?type=single&product_id=${productId}`
+            : `/orders/create/`;
+
+        const res = await api.post(url);
+        setOrder(res.data);
+      } catch (err) {
+        alert("Unable to create order");
+        navigate("/");
+      }
+    };
+
+    createOrder();
+  }, []);
+
+  // 🔹 Handle input change
+  const handleChange = (e) => {
+    setDetails({ ...details, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // 🔹 Validate details before payment
+  const validateDetails = () => {
+    const newErrors = {};
 
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
+    if (!details.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!/^[6-9]\d{9}$/.test(details.phone))
+      newErrors.phone = "Enter valid phone number";
+    if (!details.address.trim()) newErrors.address = "Address is required";
+    if (!details.city.trim()) newErrors.city = "City is required";
+    if (!/^\d{6}$/.test(details.pincode))
+      newErrors.pincode = "Invalid pincode";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // 2️⃣ Open Razorpay
+  const handlePayment = async () => {
+    if (!validateDetails()) return;
+
+    setLoading(true);
+
+    const loaded = await loadRazorpay();
+    if (!loaded) {
+      alert("Razorpay SDK failed to load");
+      setLoading(false);
       return;
     }
 
-    try {
-      const loggedUser = JSON.parse(localStorage.getItem("user"));
-      if (!loggedUser) {
-        alert("No user found!");
-        return;
-      }
+    const options = {
+      key: order.key,
+      amount: order.amount,
+      currency: "INR",
+      name: "Mapple Store",
+      description: "Secure Payment",
+      order_id: order.order_id,
 
-      const res = await api.get(
-        `/users/${loggedUser.id}`
-      );
-      const userData = res.data;
-      const resPatch = await api.patch(
-        `/users/${userData.id}`,
-        { purchase: userData.cart }
-      );
-      console.log(resPatch.data);
+      prefill: {
+        name: details.fullName,
+        contact: details.phone,
+      },
 
-      navigate("/confirmation", { state: { order: userData.cart } });
+      handler: async function (response) {
+        try {
+          await api.post("/orders/verify/", {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            address: details, // optional: store later
+          });
 
-      // console.log("User data:", userData);
-      // console.log("Cart items:", userData.cart);
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    }
+          navigate("/order-success");
+        } catch {
+          alert("Payment verification failed");
+        }
+      },
+
+      theme: { color: "#6366f1" },
+    };
+
+    new window.Razorpay(options).open();
+    setLoading(false);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-xl p-6 w-96"
-      >
-        <h2 className="text-xl font-semibold text-center mb-6">Card Payment</h2>
+  if (!order) {
+    return <div className="p-10 text-center">Preparing payment…</div>;
+  }
+//   console.log("Checkout type:", type);
+// console.log("Product ID:", productId);
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-600">
-            Card Number
-          </label>
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 space-y-6">
+        <h1 className="text-2xl font-bold text-slate-800">
+          Checkout Details
+        </h1>
+
+        {/* 🧾 User Details */}
+        <div className="space-y-3">
           <input
-            name="cardNumber"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value)}
-            type="text"
-            placeholder="1234 5678 9012 3456"
-            className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            name="fullName"
+            placeholder="Full Name"
+            value={details.fullName}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
           />
-          {error.cardNumberError && (
-            <p className="text-red-500 text-sm mt-1">
-              *{error.cardNumberError}
+          {errors.fullName && (
+            <p className="text-xs text-red-500">{errors.fullName}</p>
+          )}
+
+          <input
+            name="phone"
+            placeholder="Phone Number"
+            value={details.phone}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+          />
+          {errors.phone && (
+            <p className="text-xs text-red-500">{errors.phone}</p>
+          )}
+
+          <input
+            name="address"
+            placeholder="Street Address"
+            value={details.address}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+          />
+          {errors.address && (
+            <p className="text-xs text-red-500">{errors.address}</p>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              name="city"
+              placeholder="City"
+              value={details.city}
+              onChange={handleChange}
+              className="p-3 border rounded-xl"
+            />
+            <input
+              name="pincode"
+              placeholder="Pincode"
+              value={details.pincode}
+              onChange={handleChange}
+              className="p-3 border rounded-xl"
+            />
+          </div>
+
+          {(errors.city || errors.pincode) && (
+            <p className="text-xs text-red-500">
+              {errors.city || errors.pincode}
             </p>
           )}
         </div>
 
-        <div className="flex gap-4 mb-4">
-          <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-600">
-              Expiry
-            </label>
-            <input
-              name="expiry"
-              value={expiry}
-              onChange={(e) => setExpiry(e.target.value)}
-              type="text"
-              placeholder="MM/YY"
-              className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            {error.expiryError && (
-              <p className="text-red-500 text-sm mt-1">*{error.expiryError}</p>
-            )}
-          </div>
-
-          <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-600">
-              CVV
-            </label>
-            <input
-              name="cvv"
-              value={cvv}
-              onChange={(e) => setCvv(e.target.value)}
-              type="password"
-              placeholder="123"
-              className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            {error.cvvError && (
-              <p className="text-red-500 text-sm mt-1">*{error.cvvError}</p>
-            )}
-          </div>
+        {/* 💰 Order Summary */}
+        <div className="flex justify-between text-slate-700 font-semibold">
+          <span>Total Amount</span>
+          <span className="text-indigo-600">
+            ₹{order.amount / 100}
+          </span>
         </div>
 
+        {/* 💳 Pay Button */}
         <button
-          type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+          onClick={handlePayment}
+          disabled={loading}
+          className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:bg-slate-400"
         >
-          Pay Now
+          {loading ? "Processing..." : "Pay Securely"}
         </button>
-      </form>
+
+        <p className="text-xs text-slate-400 text-center">
+          Payments are securely processed by Razorpay
+        </p>
+      </div>
     </div>
   );
 }

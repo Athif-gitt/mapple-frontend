@@ -17,7 +17,7 @@ export default function Orders() {
         );
 
         console.log("Orders fetched:", res.data);
-        setOrders(res.data.results || []);
+        setOrders(res.data.results ?? res.data ?? []);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
       }

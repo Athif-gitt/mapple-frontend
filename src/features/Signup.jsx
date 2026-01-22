@@ -74,66 +74,67 @@ function Signup() {
 
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-slate-50 font-sans">
       <form
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm"
+        className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-sm border border-slate-100"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-          Sign Up
-        </h1>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">Create Account</h1>
+          <p className="text-slate-500 text-sm">Join Mapple for premium products</p>
+        </div>
 
-        <label className="block text-gray-700 mb-2">Username</label>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Username</label>
         <input
           onChange={(e) => setName(e.target.value)}
           type="text"
           value={name}
           placeholder="Enter username"
-          className="w-full p-3 mb-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all mb-1"
         />
-        <p className="text-amber-600 mb-4">{error.nameError}</p>
+        <p className="text-red-500 text-xs mb-3">{error.nameError}</p>
 
-        <label className="block text-gray-700 mb-2">E-Mail</label>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">E-Mail</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter email"
-          className="w-full p-3 mb-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all mb-1"
         />
-        <p className="text-amber-600 mb-4">{error.emailError}</p>
+        <p className="text-red-500 text-xs mb-3">{error.emailError}</p>
 
-        <label className="block text-gray-700 mb-2">Password</label>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter password"
-          className="w-full p-3 mb-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all mb-1"
         />
-        <p className="text-amber-600 mb-4">{error.passwordError}</p>
+        <p className="text-red-500 text-xs mb-3">{error.passwordError}</p>
 
-        <label className="block text-gray-700 mb-2">Confirm Password</label>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm Password</label>
         <input
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirm password"
-          className="w-full p-3 mb-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all mb-1"
         />
-        <p className="text-amber-600 mb-6">{error.confirmPasswordError}</p>
+        <p className="text-red-500 text-xs mb-6">{error.confirmPasswordError}</p>
 
-        <div className="flex flex-row p-4 border-black">
+        <div className="flex flex-col gap-3">
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mr-1 cursor-pointer"
+            className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
           >
             Create Account
           </button>
 
           <button
             type="button"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer"
+            className="w-full bg-white text-slate-700 border border-slate-200 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition-colors"
             onClick={() => navigate("/login")}
           >
             Back to Login

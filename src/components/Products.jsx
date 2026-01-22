@@ -3,7 +3,7 @@ import api from "@/api/axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Nav from "./Nav";
 
-function Products() {
+function Products({ categoryProp }) {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -11,7 +11,7 @@ function Products() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const category = params.get("category");
+  const category = categoryProp || params.get("category");
   const [search, setSearch] = useState("");
 
   const fetchProducts = async (page = 1) => {
@@ -57,114 +57,152 @@ function Products() {
   };
 
   return (
-    <div className="p-0 bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Nav />
 
-      {/* Search */}
-      <div className="flex justify-center mt-4 px-6">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="border border-gray-300 px-4 py-2 rounded-lg w-full max-w-md"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+      {/* Header & Filters */}
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8 text-center">
+          {category ? `${category.charAt(0).toUpperCase() + category.slice(1)} Products` : "All Products"}
+        </h1>
 
-      {/* Categories */}
-      <div className="flex justify-center gap-3 mt-6 px-6">
-        {["iphone", "macbook", "airpods"].map((c) => (
-          <button
-            key={c}
-            onClick={() => navigate(`/products?category=${c}`)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            {c.toUpperCase()}
-          </button>
-        ))}
-      </div>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+          {/* Search */}
+          <div className="relative w-full max-w-md">
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-slate-400 absolute left-4 top-3.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </div>
 
-      {/* Title */}
-      <h1 className="text-3xl font-bold text-center text-gray-800 my-5">
-        {category ? `${category.toUpperCase()} Products` : "All Products"}
-      </h1>
-
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6">
-        {products.length > 0 ? (
-          products.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => handleCardClick(item)}
-              className="relative bg-white rounded-xl shadow-md hover:shadow-lg transition p-4 cursor-pointer"
+          {/* Categories */}
+          <div className="flex gap-3 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
+            <button
+              onClick={() => navigate("/products")}
+              className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${!category ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                }`}
             >
-              {/* Wishlist heart icon */}
-              <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddToWishlist(item);
-                }}
-                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl transition cursor-pointer"
-              >
-                ❤️
-              </span>
-
-              <img
-                src={item.image}
-                className="h-40 w-full object-contain mb-3"
-              />
-              <h3 className="font-semibold">{item.name}</h3>
-              <p className="text-gray-500 text-sm">{item.description}</p>
-              <p className="text-blue-600 font-bold mt-2">${item.price}</p>
-
+              All
+            </button>
+            {["iphone", "macbook", "airpods"].map((c) => (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddToCart(item);
-                }}
-                className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full"
+                key={c}
+                onClick={() => navigate(`/products?category=${c}`)}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${category === c ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  }`}
               >
-                Add to Cart
+                {c.charAt(0).toUpperCase() + c.slice(1)}
               </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {products.length > 0 ? (
+            products.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => handleCardClick(item)}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden flex flex-col cursor-pointer relative"
+              >
+                {/* Wishlist Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddToWishlist(item);
+                  }}
+                  className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill={item.wishlisted ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                  </svg>
+                </button>
+
+                {/* Image Container */}
+                <div className="relative overflow-hidden aspect-[4/3] bg-slate-50 flex items-center justify-center p-6">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500 ease-out"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="p-5 flex flex-col flex-grow">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-slate-800 text-lg group-hover:text-indigo-600 transition-colors line-clamp-1">{item.name}</h3>
+                    <span className="font-bold text-indigo-600 text-lg">${item.price}</span>
+                  </div>
+                  <p className="text-slate-500 text-sm line-clamp-2 mb-4 leading-relaxed">{item.description}</p>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(item);
+                    }}
+                    className="mt-auto w-full py-2.5 bg-slate-900 text-white rounded-xl font-semibold text-sm hover:bg-indigo-600 transition-colors shadow-lg shadow-slate-200 hover:shadow-indigo-200 flex items-center justify-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                    </svg>
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center">
+              <div className="inline-block p-4 rounded-full bg-slate-100 mb-4 text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No products found</h3>
+              <p className="text-slate-500">Try adjusting your search or category filter.</p>
             </div>
-          ))
-        ) : (
-          <p className="text-center text-gray-500 col-span-full">
-            No products found.
-          </p>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {products.length > 0 && (
+          <div className="flex justify-center items-center gap-2 mt-16">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => fetchProducts(currentPage - 1)}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white transition-colors text-sm font-medium"
+            >
+              Previous
+            </button>
+
+            {pageNumbers.map((num) => (
+              <button
+                key={num}
+                onClick={() => fetchProducts(num)}
+                className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors flex items-center justify-center ${num === currentPage
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                  }`}
+              >
+                {num}
+              </button>
+            ))}
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => fetchProducts(currentPage + 1)}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white transition-colors text-sm font-medium"
+            >
+              Next
+            </button>
+          </div>
         )}
-      </div>
-
-      {/* PAGINATION UI */}
-      <div className="flex justify-center items-center gap-2 mt-8 pb-10">
-        <button
-          disabled={currentPage === 1}
-          onClick={() => fetchProducts(currentPage - 1)}
-          className="px-3 py-2 bg-gray-300 rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-
-        {pageNumbers.map((num) => (
-          <button
-            key={num}
-            onClick={() => fetchProducts(num)}
-            className={`px-3 py-2 rounded ${num === currentPage
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-              }`}
-          >
-            {num}
-          </button>
-        ))}
-
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => fetchProducts(currentPage + 1)}
-          className="px-3 py-2 bg-gray-300 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
       </div>
     </div>
   );

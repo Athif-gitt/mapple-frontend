@@ -35,50 +35,67 @@ function Nav() {
   }, []);
 
   return (
-    <div>
-      <nav className="flex justify-between items-center bg-white px-6 py-4 shadow-md">
-        <h1 className="text-2xl font-bold text-gray-800">Mapple </h1>
-        <ul className="flex space-x-6 text-gray-700 font-medium">
-          <li className="hover:text-blue-600 cursor-pointer">
-            <Link to="/">Home</Link>
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <nav className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+            Mapple
+          </span>
+          <span className="text-2xl"></span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <ul className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-600">
+          <li>
+            <Link to="/" className="hover:text-indigo-600 transition-colors">Home</Link>
           </li>
-          <li className="hover:text-blue-600 cursor-pointer">
-            <Link to="/products">Products</Link>
+          <li>
+            <Link to="/products" className="hover:text-indigo-600 transition-colors">Products</Link>
           </li>
-          <li className="hover:text-blue-600 cursor-pointer relative">
-            <Link to="/wishlist">Wishlist</Link>
+          <li>
+            <Link to="/wishlist" className="hover:text-indigo-600 transition-colors">Wishlist</Link>
           </li>
-          <li className="hover:text-blue-600 cursor-pointer relative">
-            <Link to="/cart">
-              Cart
-              <span className="ml-1 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs absolute -top-2 -right-3">
+          <li>
+            <Link to="/orders" className="hover:text-indigo-600 transition-colors">Orders</Link>
+          </li>
+        </ul>
+
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-6">
+          <Link to="/cart" className="relative group p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-700 group-hover:text-indigo-600">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+            {cartQuantity > 0 && (
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full">
                 {cartQuantity}
               </span>
-            </Link>
-          </li>
-          <li className="hover:text-blue-600 cursor-pointer relative">
-            <Link to={"/orders/"}>Orders</Link>
-          </li>
+            )}
+          </Link>
 
           {loggedIn ? (
-            <li
-              className="hover:text-blue-600 cursor-pointer"
+            <button
               onClick={() => {
                 localStorage.removeItem("access-token");
                 localStorage.removeItem("refresh-token");
                 setLoggedIn(false);
               }}
+              className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
             >
               Logout
-            </li>
+            </button>
           ) : (
-            <li className="hover:text-blue-600 cursor-pointer">
-              <Link to="/login">Login</Link>
-            </li>
+            <Link
+              to="/login"
+              className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
+            >
+              Login
+            </Link>
           )}
-        </ul>
+        </div>
       </nav>
-    </div>
+    </header>
   );
 }
 

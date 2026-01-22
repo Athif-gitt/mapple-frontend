@@ -29,9 +29,12 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/products" element={<Products />}></Route>
         <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/iphone" element={<Iphone />}></Route>
-        <Route path="/macbook" element={<MacBook />}></Route>
-        <Route path="/earpod" element={<AirPod />}></Route>
+
+        {/* Unify Legacy Routes */}
+        <Route path="/iphone" element={<Products categoryProp="iphone" />}></Route>
+        <Route path="/macbook" element={<Products categoryProp="macbook" />}></Route>
+        <Route path="/earpod" element={<Products categoryProp="airpods" />}></Route>
+
         <Route path="/payment" element={<Payment />}></Route>
         {/* <Route path="/payment" element={<Payment />}></Route> */}
         <Route path="/orders" element={<Orders />}></Route>
@@ -40,10 +43,6 @@ function App() {
         <Route path="/admin-home/*" element={<AdminHome />} />
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/orders/:id" element={<OrderDetails />} />
-        {/* <Route path="/admin-home/users/" element={<AdminUsers />} />
-        <Route path="/admin-home/users/" element={<AdminUsers />} />
-        <Route path="/admin-home/users/" element={<AdminUsers />} />
-        <Route path="/admin-home/users/:id" element={<UserDetails />} /> */}
       </Routes>
       <Footer />
     </div>
