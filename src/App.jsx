@@ -20,6 +20,8 @@ import AdminUsers from "./Admin/Pages/AdminUsers";
 import UserDetails from "./Admin/Pages/UserDetails";
 import Nav from "./components/Nav";
 import ScrollToTop from "./utils/ScrollToTop";
+import OAuthCallback from "@/features/auth/OAuthCallback";
+
 
 function App() {
   return (
@@ -45,6 +47,8 @@ function App() {
         <Route path="/admin-home/*" element={<AdminHome />} />
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/orders/:id" element={<OrderDetails />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
+
       </Routes>
       <Footer />
     </div>

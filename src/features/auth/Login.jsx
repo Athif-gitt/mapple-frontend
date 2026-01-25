@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import api from "@/api/axios";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
-  // 'name' state is used to collect the username from the input field
+
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState({});
@@ -25,6 +25,7 @@ function Login() {
     return newError;
   };
 
+  // 🔐 PASSWORD LOGIN (OAuth2 Password Grant)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
@@ -35,36 +36,61 @@ function Login() {
     }
 
     try {
-      // FIX: Map React 'name' to the 'username' key required by your Django Serializer
-      const res = await api.post("/auth/login/", {
+      setError({});
+
+      const data = new URLSearchParams({
+        grant_type: "password",
         username: name.trim(),
         password: password,
+        client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
+        client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET,
       });
 
-      // Securely store JWT tokens
-      localStorage.setItem("access-token", res.data.access);
-      localStorage.setItem("refresh-token", res.data.refresh);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/o/token/`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
-      // Fetch user details for conditional routing
-      const userRes = await api.get("/auth/me/");
+      // Store tokens
+      localStorage.setItem("access-token", res.data.access_token);
+      localStorage.setItem("refresh-token", res.data.refresh_token);
+
+      // Fetch user info
+      const userRes = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/me/`,
+        {
+          headers: {
+            Authorization: `Bearer ${res.data.access_token}`,
+          },
+        }
+      );
+
       if (userRes.data.is_staff) {
-        window.location.href = "/admin-home/stats/"; 
+        window.location.href = "/admin-home/stats/";
       } else {
-        navigate("/"); 
+        navigate("/");
       }
     } catch (err) {
-      // Debug log to capture exact field errors from Django
-      console.error("Backend Validation Error:", err.response?.data);
-      
+      console.error("OAuth Login Error:", err.response?.data);
+
       const serverError = err.response?.data;
-      if (serverError?.non_field_errors) {
-          alert(serverError.non_field_errors[0]);
-      } else if (serverError?.detail) {
-          alert(serverError.detail);
+
+      if (serverError?.error_description) {
+        alert(serverError.error_description);
       } else {
-          alert("Login failed. Please check your credentials.");
+        alert("Login failed. Please check your credentials.");
       }
     }
+  };
+
+  // 🔵 GOOGLE LOGIN
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/accounts/google/login/`;
   };
 
   return (
@@ -74,37 +100,42 @@ function Login() {
         onSubmit={handleSubmit}
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Welcome Back</h1>
-          <p className="text-slate-500 text-sm">Please sign in to your account</p>
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-slate-500 text-sm">
+            Please sign in to your account
+          </p>
         </div>
 
-        {/* Username Input */}
-        <label className="block text-sm font-semibold text-slate-700 mb-2">Username</label>
-        <div className="relative mb-1">
-          <input
-            onChange={(e) => setName(e.target.value)}
-            type="text"
-            value={name}
-            placeholder="Enter username"
-            className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
-          />
-        </div>
+        {/* Username */}
+        <label className="block text-sm font-semibold text-slate-700 mb-2">
+          Username
+        </label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter username"
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all mb-1"
+        />
         <p className="text-red-500 text-xs mb-4">{error.nameError}</p>
 
-        {/* Password Input */}
-        <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-        <div className="relative mb-1">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
-          />
-        </div>
+        {/* Password */}
+        <label className="block text-sm font-semibold text-slate-700 mb-2">
+          Password
+        </label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter password"
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all mb-1"
+        />
         <p className="text-red-500 text-xs mb-6">{error.passwordError}</p>
 
         <div className="flex flex-col gap-3">
+          {/* Password Login */}
           <button
             type="submit"
             className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
@@ -112,6 +143,21 @@ function Login() {
             Login
           </button>
 
+          {/* Google Login */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full bg-white text-slate-700 border border-slate-200 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition-colors flex items-center justify-center gap-3"
+          >
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </button>
+
+          {/* Signup */}
           <button
             type="button"
             className="w-full bg-white text-slate-700 border border-slate-200 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition-colors"
