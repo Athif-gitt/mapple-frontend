@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Profiler } from "react";
 import Home from "./Home";
 import Login from "./features/auth/Login";
 import { Routes, Route } from "react-router-dom";
@@ -21,6 +21,7 @@ import UserDetails from "./Admin/Pages/UserDetails";
 import Nav from "./components/Nav";
 import ScrollToTop from "./utils/ScrollToTop";
 import OAuthCallback from "@/features/auth/OAuthCallback";
+import Profile from './components/Profile'
 
 
 function App() {
@@ -48,6 +49,9 @@ function App() {
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/orders/:id" element={<OrderDetails />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+        <Route path="/profile" element={<Profile />} />
+
 
       </Routes>
       <Footer />

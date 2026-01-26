@@ -3,78 +3,77 @@ import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/api/axios";
 import { loadRazorpay } from "@/utils/razorpay";
 import { formatCurrency } from "../utils/currency";
+import AddAddressModal from "./AddAddressModal";
 
 export default function Payment() {
-
   const navigate = useNavigate();
   const location = useLocation();
 
   const { type = "cart", productId } = location.state || {};
 
-  const [loading, setLoading] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [order, setOrder] = useState(null);
 
-  // 🔹 User details state
-  const [details, setDetails] = useState({
-    fullName: "",
-    phone: "",
-    address: "",
-    city: "",
-    pincode: "",
-  });
+  const [loading, setLoading] = useState(false);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
 
-  const [errors, setErrors] = useState({});
+  // 🔹 Fetch addresses
+  const loadAddresses = async () => {
+    try {
+      const res = await api.get("/adresses/");
+      setAddresses(res.data);
 
-  // 1️⃣ Create order on backend when page loads
+      const def = res.data.find(a => a.is_default);
+      if (def) setSelectedAddress(def);
+    } catch {
+      alert("Failed to load addresses");
+    }
+  };
+
   useEffect(() => {
+    loadAddresses();
+  }, []);
+
+  // 🔹 Create order when address selected
+  useEffect(() => {
+    if (!selectedAddress) return;
+
     const createOrder = async () => {
       try {
+        setCreatingOrder(true);
+
         const url =
           type === "single"
             ? `/orders/create/?type=single&product_id=${productId}`
-            : `/orders/create/`;
+            : `/orders/create/?type=cart`;
 
-        const res = await api.post(url);
+        const res = await api.post(url, {
+          address_id: selectedAddress.id,
+        });
+
         setOrder(res.data);
       } catch (err) {
-        alert("Unable to create order");
+        alert(err.response?.data?.detail || "Unable to create order");
         navigate("/");
+      } finally {
+        setCreatingOrder(false);
       }
     };
 
     createOrder();
-  }, []);
+  }, [selectedAddress]);
 
-  // 🔹 Handle input change
-  const handleChange = (e) => {
-    setDetails({ ...details, [e.target.name]: e.target.value });
-  };
-
-  // 🔹 Validate details before payment
-  const validateDetails = () => {
-    const newErrors = {};
-
-    if (!details.fullName.trim()) newErrors.fullName = "Full name is required";
-    if (!/^[6-9]\d{9}$/.test(details.phone))
-      newErrors.phone = "Enter valid phone number";
-    if (!details.address.trim()) newErrors.address = "Address is required";
-    if (!details.city.trim()) newErrors.city = "City is required";
-    if (!/^\d{6}$/.test(details.pincode))
-      newErrors.pincode = "Invalid pincode";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // 2️⃣ Open Razorpay
+  // 🔹 Razorpay
   const handlePayment = async () => {
-    if (!validateDetails()) return;
+    if (!order) return;
 
     setLoading(true);
 
     const loaded = await loadRazorpay();
     if (!loaded) {
-      alert("Razorpay SDK failed to load");
+      alert("Razorpay failed to load");
       setLoading(false);
       return;
     }
@@ -84,28 +83,24 @@ export default function Payment() {
       amount: order.amount,
       currency: "INR",
       name: "Mapple Store",
-      description: "Secure Payment",
+      description: "Secure Checkout",
       order_id: order.order_id,
 
-      prefill: {
-        name: details.fullName,
-        contact: details.phone,
-      },
+      handler: async (response) => {
+  try {
+    const res = await api.post("/orders/verify/", {
+      razorpay_order_id: response.razorpay_order_id,
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_signature: response.razorpay_signature,
+    });
 
-      handler: async function (response) {
-        try {
-          await api.post("/orders/verify/", {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            address: details, // optional: store later
-          });
+    // ✅ redirect using DB order id
+    navigate(`/orders/${res.data.order_id}`);
+  } catch {
+    alert("Payment verification failed");
+  }
+},
 
-          navigate("/order-success");
-        } catch {
-          alert("Payment verification failed");
-        }
-      },
 
       theme: { color: "#6366f1" },
     };
@@ -114,99 +109,84 @@ export default function Payment() {
     setLoading(false);
   };
 
-  if (!order) {
-    return <div className="p-10 text-center">Preparing payment…</div>;
-  }
-  //   console.log("Checkout type:", type);
-  // console.log("Product ID:", productId);
-
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 space-y-6">
-        <h1 className="text-2xl font-bold text-slate-800">
-          Checkout Details
-        </h1>
+    <div className="min-h-screen bg-slate-50 py-10 px-4">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        {/* 🧾 User Details */}
-        <div className="space-y-3">
-          <input
-            name="fullName"
-            placeholder="Full Name"
-            value={details.fullName}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-          />
-          {errors.fullName && (
-            <p className="text-xs text-red-500">{errors.fullName}</p>
-          )}
+        {/* LEFT — ADDRESS */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold mb-4">Delivery Address</h2>
 
-          <input
-            name="phone"
-            placeholder="Phone Number"
-            value={details.phone}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-          />
-          {errors.phone && (
-            <p className="text-xs text-red-500">{errors.phone}</p>
-          )}
-
-          <input
-            name="address"
-            placeholder="Street Address"
-            value={details.address}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-          />
-          {errors.address && (
-            <p className="text-xs text-red-500">{errors.address}</p>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              name="city"
-              placeholder="City"
-              value={details.city}
-              onChange={handleChange}
-              className="p-3 border rounded-xl"
-            />
-            <input
-              name="pincode"
-              placeholder="Pincode"
-              value={details.pincode}
-              onChange={handleChange}
-              className="p-3 border rounded-xl"
-            />
+          <div className="space-y-3">
+            {addresses.map(addr => (
+              <div
+                key={addr.id}
+                onClick={() => {
+                  setSelectedAddress(addr);
+                  setOrder(null);
+                }}
+                className={`p-4 rounded-xl border cursor-pointer transition ${
+                  selectedAddress?.id === addr.id
+                    ? "border-indigo-600 bg-indigo-50"
+                    : "border-slate-200 hover:border-slate-400"
+                }`}
+              >
+                <p className="font-semibold">{addr.full_name}</p>
+                <p className="text-sm text-slate-600">
+                  {addr.line1}, {addr.city}, {addr.state} – {addr.pincode}
+                </p>
+                <p className="text-sm text-slate-600">{addr.phone}</p>
+              </div>
+            ))}
           </div>
 
-          {(errors.city || errors.pincode) && (
-            <p className="text-xs text-red-500">
-              {errors.city || errors.pincode}
-            </p>
-          )}
+          <button
+            onClick={() => setShowAddressModal(true)}
+            className="mt-4 text-indigo-600 font-semibold hover:underline"
+          >
+            + Add new address
+          </button>
         </div>
 
-        {/* 💰 Order Summary */}
-        <div className="flex justify-between text-slate-700 font-semibold">
-          <span>Total Amount</span>
-          <span className="text-indigo-600">
-            {formatCurrency(order.amount / 100)}
-          </span>
+        {/* RIGHT — SUMMARY */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm h-fit sticky top-6">
+          <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+
+          <div className="flex justify-between mb-2">
+            <span>Total</span>
+            <span className="font-bold">
+              {order ? formatCurrency(order.amount / 100) : "—"}
+            </span>
+          </div>
+
+          <button
+            onClick={handlePayment}
+            disabled={!order || loading || creatingOrder}
+            className="mt-6 w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 disabled:bg-slate-400"
+          >
+            {creatingOrder
+              ? "Preparing order..."
+              : loading
+              ? "Processing..."
+              : "Pay Securely"}
+          </button>
+
+          <p className="text-xs text-slate-400 text-center mt-3">
+            100% secure payments via Razorpay
+          </p>
         </div>
-
-        {/* 💳 Pay Button */}
-        <button
-          onClick={handlePayment}
-          disabled={loading}
-          className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:bg-slate-400 cursor-pointer"
-        >
-          {loading ? "Processing..." : "Pay Securely"}
-        </button>
-
-        <p className="text-xs text-slate-400 text-center">
-          Payments are securely processed by Razorpay
-        </p>
       </div>
+
+      {/* ➕ Add Address Modal */}
+      {showAddressModal && (
+        <AddAddressModal
+          onClose={() => setShowAddressModal(false)}
+          onSuccess={() => {
+            setShowAddressModal(false);
+            loadAddresses();
+          }}
+        />
+      )}
     </div>
   );
 }
