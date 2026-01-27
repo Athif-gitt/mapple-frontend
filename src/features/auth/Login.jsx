@@ -9,84 +9,98 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState({});
 
-  const validate = () => {
-    const newError = {};
+  // const validate = () => {
+  //   const newError = {};
 
-    if (!name.trim()) {
-      newError.nameError = "Username is required";
-    }
+  //   if (!name.trim()) {
+  //     newError.nameError = "Username is required";
+  //   }
 
-    if (!password.trim()) {
-      newError.passwordError = "Password is required";
-    } else if (password.length < 6) {
-      newError.passwordError = "Password must be at least 6 characters";
-    }
+  //   if (!password.trim()) {
+  //     newError.passwordError = "Password is required";
+  //   } else if (password.length < 6) {
+  //     newError.passwordError = "Password must be at least 6 characters";
+  //   }
 
-    return newError;
-  };
+  //   return newError;
+  // };
 
   // 🔐 PASSWORD LOGIN (OAuth2 Password Grant)
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
+  e.preventDefault();
+  setError({}); // clear previous errors
 
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
-      return;
+  try {
+    const data = new URLSearchParams({
+      grant_type: "password",
+      username: name.trim(),
+      password: password,
+      client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
+      client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET,
+    });
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/o/token/`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    // Store tokens
+    localStorage.setItem("access-token", res.data.access_token);
+    localStorage.setItem("refresh-token", res.data.refresh_token);
+
+    // Fetch user info
+    const userRes = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/auth/me/`,
+      {
+        headers: {
+          Authorization: `Bearer ${res.data.access_token}`,
+        },
+      }
+    );
+
+    if (userRes.data.is_staff) {
+      window.location.href = "/admin-home/stats/";
+    } else {
+      navigate("/");
+    }
+  } catch (err) {
+    const serverError = err.response?.data;
+    const formattedErrors = {};
+
+    /*
+      OAuth2 error examples:
+      - invalid_grant
+      - invalid_request
+      - missing username / password
+    */
+
+    if (serverError?.error === "invalid_grant") {
+      formattedErrors.nameError = "Invalid username or password";
+      formattedErrors.passwordError = "Invalid username or password";
     }
 
-    try {
-      setError({});
-
-      const data = new URLSearchParams({
-        grant_type: "password",
-        username: name.trim(),
-        password: password,
-        client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-        client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET,
-      });
-
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/o/token/`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-
-      // Store tokens
-      localStorage.setItem("access-token", res.data.access_token);
-      localStorage.setItem("refresh-token", res.data.refresh_token);
-
-      // Fetch user info
-      const userRes = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/me/`,
-        {
-          headers: {
-            Authorization: `Bearer ${res.data.access_token}`,
-          },
-        }
-      );
-
-      if (userRes.data.is_staff) {
-        window.location.href = "/admin-home/stats/";
-      } else {
-        navigate("/");
+    if (serverError?.error === "invalid_request") {
+      if (serverError.error_description?.includes("username")) {
+        formattedErrors.nameError = "Username is required";
       }
-    } catch (err) {
-      console.error("OAuth Login Error:", err.response?.data);
-
-      const serverError = err.response?.data;
-
-      if (serverError?.error_description) {
-        alert(serverError.error_description);
-      } else {
-        alert("Login failed. Please check your credentials.");
+      if (serverError.error_description?.includes("password")) {
+        formattedErrors.passwordError = "Password is required";
       }
     }
-  };
+
+    if (Object.keys(formattedErrors).length === 0) {
+      formattedErrors.passwordError = "Login failed. Please try again.";
+    }
+
+    setError(formattedErrors);
+  }
+};
+
 
   // 🔵 GOOGLE LOGIN
   const handleGoogleLogin = () => {

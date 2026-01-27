@@ -11,66 +11,72 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState({});
 
-  const validate = () => {
-    const newError = {};
+  // const validate = () => {
+  //   const newError = {};
 
-    if (!name.trim()) {
-      newError.nameError = "Required";
-    }
+  //   if (!name.trim()) {
+  //     newError.nameError = "Required";
+  //   }
 
-    if (!email.trim()) {
-      newError.emailError = "Required";
-    } else if (!email.includes("@")) {
-      newError.emailError = "@ required";
-    }
+  //   if (!email.trim()) {
+  //     newError.emailError = "Required";
+  //   } else if (!email.includes("@")) {
+  //     newError.emailError = "@ required";
+  //   }
 
-    if (!password.trim()) {
-      newError.passwordError = "Required";
-    } else if (password.length < 6) {
-      newError.passwordError = "Password must be at least 6 characters";
-    }
+  //   if (!password.trim()) {
+  //     newError.passwordError = "Required";
+  //   } else if (password.length < 6) {
+  //     newError.passwordError = "Password must be at least 6 characters";
+  //   }
 
-    if (!confirmPassword.trim()) {
-      newError.confirmPasswordError = "Required";
-    } else if (password !== confirmPassword) {
-      newError.confirmPasswordError = "Passwords do not match";
-    }
+  //   if (!confirmPassword.trim()) {
+  //     newError.confirmPasswordError = "Required";
+  //   } else if (password !== confirmPassword) {
+  //     newError.confirmPasswordError = "Passwords do not match";
+  //   }
 
-    return newError;
-  };
+  //   return newError;
+  // };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
+  e.preventDefault();
+  setError({}); // clear old errors
 
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
-      return;
-    }
+  try {
+    await api.post("/auth/register/", {
+      username: name,
+      email,
+      password,
+    });
 
-    try {
-      const res = await api.post(
-        "/auth/register/",
-        {
-          username: name,
-          email,
-          password,
-        }
-      );
+    alert("Account created successfully!");
+    navigate("/login");
 
-      alert("Account created successfully!");
-      navigate("/login");
+  } catch (err) {
+    if (err.response?.status === 400) {
+      const backendErrors = err.response.data;
+      const formattedErrors = {};
 
-    } catch (err) {
-      console.error(err);
-
-      if (err.response?.status === 400) {
-        alert("User already exists or invalid data");
-      } else {
-        alert(err.response.Object);
+      if (backendErrors.username) {
+        formattedErrors.nameError = backendErrors.username[0];
       }
+
+      if (backendErrors.email) {
+        formattedErrors.emailError = backendErrors.email[0];
+      }
+
+      if (backendErrors.password) {
+        formattedErrors.passwordError = backendErrors.password[0];
+      }
+
+      setError(formattedErrors);
+    } else {
+      alert("Something went wrong");
     }
-  };
+  }
+};
+
 
 
   return (

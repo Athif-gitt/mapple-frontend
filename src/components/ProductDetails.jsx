@@ -3,8 +3,10 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import api from "@/api/axios";
 import { formatCurrency } from "../utils/currency";
 import Nav from "./Nav";
+import Reviews from "./reviews";
 
 export default function ProductDetails() {
+  const isLoggedIn = !!localStorage.getItem("access-token");
   const { id } = useParams(); // URL ID
   const location = useLocation(); // navigation state
   const navigate = useNavigate();
@@ -103,6 +105,10 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+      <Reviews
+        productId={product.id}
+        isLoggedIn={isLoggedIn}
+      />
     </div>
   );
 }
