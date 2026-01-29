@@ -31,30 +31,58 @@ function Reviews({ productId, isLoggedIn }) {
     fetchReviews();
   }, [productId]);
 
+  useEffect(() => {
+  const ws = new WebSocket(
+    `ws://127.0.0.1:8000/ws/products/${productId}/reviews/`
+  );
+
+  ws.onmessage = (event) => {
+    const newReview = JSON.parse(event.data);
+    console.log("From WEBSOCKEt")
+
+    // Prevent duplicate (important!)
+    setReviews((prev) => {
+      const exists = prev.some(r => r.id === newReview.id);
+      if (exists) return prev;
+      return [newReview, ...prev];
+    });
+  };
+
+  ws.onerror = () => {
+    console.error("WebSocket error");
+  };
+
+  return () => {
+    ws.close();
+  };
+}, [productId]);
+
   const fetchReviews = async () => {
     const res = await getReviews(productId);
     setReviews(res.data);
+    console.log("Not Web Socket")
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  e.preventDefault();
+  setError(null);
+  setLoading(true);
 
-    try {
-      await addReview(productId, { rating, comment });
-      setRating(5);
-      setComment("");
-      fetchReviews();
-    } catch (err) {
-      const data = err.response?.data;
-      if (data?.non_field_errors) setError(data.non_field_errors[0]);
-      else if (data?.rating) setError(data.rating[0]);
-      else setError("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await addReview(productId, { rating, comment });
+    setRating(5);
+    setComment("");
+    // ❌ DO NOT refetch here
+  } catch (err) {
+    const data = err.response?.data;
+    if (data?.non_field_errors) setError(data.non_field_errors[0]);
+    else if (data?.rating) setError(data.rating[0]);
+    else setError("Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <section className="mt-12">

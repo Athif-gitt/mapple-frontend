@@ -57,12 +57,16 @@ function Home() {
               Browse Collection
             </button>
 
-            <button
-              onClick={() => navigate("/login")}
-              className="px-8 py-4 bg-white/10 text-white border border-white/30 backdrop-blur rounded-xl font-semibold text-lg hover:bg-white/20 transition-all"
-            >
-              Sign In
-            </button>
+            {!localStorage.getItem("access-token") && (
+  <button
+    onClick={() => navigate("/login")}
+    className="px-8 py-4 bg-white/10 text-white border border-white/30 backdrop-blur rounded-xl font-semibold text-lg hover:bg-white/20 transition-all"
+  >
+    Sign In
+  </button>
+)}
+
+
           </div>
         </div>
       </section>
