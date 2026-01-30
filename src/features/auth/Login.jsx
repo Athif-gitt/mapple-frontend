@@ -34,7 +34,6 @@ const handleSubmit = async (e) => {
   setError({});
 
   try {
-    // ✅ SimpleJWT login
     const res = await api.post("/token/", {
       username: name.trim(),
       password,
@@ -42,11 +41,9 @@ const handleSubmit = async (e) => {
 
     console.log("LOGIN RESPONSE:", res.data);
 
-    // ✅ Correct JWT keys
     localStorage.setItem("access-token", res.data.access);
     localStorage.setItem("refresh-token", res.data.refresh);
 
-    // ✅ Authenticated request (interceptor works)
     const userRes = await api.get("/auth/me/");
 
     if (userRes.data.is_staff) {
@@ -65,7 +62,6 @@ const handleSubmit = async (e) => {
 
 
 
-  // 🔵 GOOGLE LOGIN
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_BACKEND_URL}/accounts/google/login/`;
   };
