@@ -39,7 +39,6 @@ const handleSubmit = async (e) => {
       password,
     });
 
-    console.log("LOGIN RESPONSE:", res.data);
 
     localStorage.setItem("access-token", res.data.access);
     localStorage.setItem("refresh-token", res.data.refresh);
