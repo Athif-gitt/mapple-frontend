@@ -4,7 +4,7 @@ import Login from "./features/auth/Login";
 import { Routes, Route } from "react-router-dom";
 import Cart from "./components/Cart";
 import Products from "./components/Products";
-import SignUp from "./features/SignUp";
+import Signup from "./features/Signup"
 import Iphone from "./components/Products/Iphone";
 import AirPod from "./components/Products/AirPod";
 import MacBook from "./components/Products/MacBook";
@@ -33,7 +33,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/products" element={<Products />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
+        <Route path="/signup" element={<Signup />}></Route>
 
         {/* Unify Legacy Routes */}
         <Route path="/iphone" element={<Products categoryProp="iphone" />}></Route>
