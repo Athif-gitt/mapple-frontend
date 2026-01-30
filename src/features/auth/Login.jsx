@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "@/api/axios";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -26,80 +28,41 @@ function Login() {
   // };
 
   // 🔐 PASSWORD LOGIN (OAuth2 Password Grant)
-  const handleSubmit = async (e) => {
+
+const handleSubmit = async (e) => {
   e.preventDefault();
-  setError({}); // clear previous errors
+  setError({});
 
   try {
-    const data = new URLSearchParams({
-      grant_type: "password",
+    // ✅ SimpleJWT login
+    const res = await api.post("/token/", {
       username: name.trim(),
-      password: password,
-      client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-      client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET,
+      password,
     });
 
-    const res = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/o/token/`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    console.log("LOGIN RESPONSE:", res.data);
 
-    // Store tokens
-    localStorage.setItem("access-token", res.data.access_token);
-    localStorage.setItem("refresh-token", res.data.refresh_token);
+    // ✅ Correct JWT keys
+    localStorage.setItem("access-token", res.data.access);
+    localStorage.setItem("refresh-token", res.data.refresh);
 
-    // Fetch user info
-    const userRes = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/auth/me/`,
-      {
-        headers: {
-          Authorization: `Bearer ${res.data.access_token}`,
-        },
-      }
-    );
+    // ✅ Authenticated request (interceptor works)
+    const userRes = await api.get("/auth/me/");
 
     if (userRes.data.is_staff) {
-      window.location.href = "/admin-home/stats/";
+      navigate("/admin-home/stats/");
     } else {
       navigate("/");
     }
   } catch (err) {
-    const serverError = err.response?.data;
-    const formattedErrors = {};
-
-    /*
-      OAuth2 error examples:
-      - invalid_grant
-      - invalid_request
-      - missing username / password
-    */
-
-    if (serverError?.error === "invalid_grant") {
-      formattedErrors.nameError = "Invalid username or password";
-      formattedErrors.passwordError = "Invalid username or password";
-    }
-
-    if (serverError?.error === "invalid_request") {
-      if (serverError.error_description?.includes("username")) {
-        formattedErrors.nameError = "Username is required";
-      }
-      if (serverError.error_description?.includes("password")) {
-        formattedErrors.passwordError = "Password is required";
-      }
-    }
-
-    if (Object.keys(formattedErrors).length === 0) {
-      formattedErrors.passwordError = "Login failed. Please try again.";
-    }
-
-    setError(formattedErrors);
+    console.error("LOGIN ERROR:", err.response?.data || err);
+    setError({
+      nameError: "Invalid username or password",
+      passwordError: "Invalid username or password",
+    });
   }
 };
+
 
 
   // 🔵 GOOGLE LOGIN
