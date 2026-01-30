@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import AdminSidebar from "../Components/AdminSidebar";
-import AdminHeader from "../components/AdminHeader";
+import AdminHeader from "../Components/AdminHeader";
 import AdminProducts from "./AdminProducts";
 import AdminUsers from "./AdminUsers";
 import UserDetails from "./UserDetails";
