@@ -32,36 +32,51 @@ function Reviews({ productId, isLoggedIn }) {
   }, [productId]);
 
   useEffect(() => {
-  const ws = new WebSocket(
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-const WS_BASE_URL = import.meta.env.VITE_BACKEND_URL.replace(/^https?/, protocol);
+  if (!productId) return;
 
-const socket = new WebSocket(
-  `${WS_BASE_URL}/ws/products/${productId}/reviews/`
-);
+  // 1. Decide protocol
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 
+  // 2. Convert backend URL → ws/wss
+  const WS_BASE_URL = import.meta.env.VITE_BACKEND_URL.replace(
+    /^https?/,
+    protocol
   );
+
+  // 3. Create socket
+  const ws = new WebSocket(
+    `${WS_BASE_URL}/ws/products/${productId}/reviews/`
+  );
+
+  ws.onopen = () => {
+    console.log("✅ WebSocket connected");
+  };
 
   ws.onmessage = (event) => {
     const newReview = JSON.parse(event.data);
-    console.log("From WEBSOCKEt")
+    console.log("📡 WebSocket message", newReview);
 
-    // Prevent duplicate (important!)
     setReviews((prev) => {
-      const exists = prev.some(r => r.id === newReview.id);
+      const exists = prev.some((r) => r.id === newReview.id);
       if (exists) return prev;
       return [newReview, ...prev];
     });
   };
 
-  ws.onerror = () => {
-    console.error("WebSocket error");
+  ws.onerror = (err) => {
+    console.error("❌ WebSocket error", err);
   };
 
+  ws.onclose = () => {
+    console.log("🔌 WebSocket closed");
+  };
+
+  // 4. Cleanup
   return () => {
     ws.close();
   };
 }, [productId]);
+
 
   const fetchReviews = async () => {
     const res = await getReviews(productId);
