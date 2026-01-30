@@ -33,7 +33,13 @@ function Reviews({ productId, isLoggedIn }) {
 
   useEffect(() => {
   const ws = new WebSocket(
-    `ws://127.0.0.1:8000/ws/products/${productId}/reviews/`
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+const WS_BASE_URL = import.meta.env.VITE_BACKEND_URL.replace(/^https?/, protocol);
+
+const socket = new WebSocket(
+  `${WS_BASE_URL}/ws/products/${productId}/reviews/`
+);
+
   );
 
   ws.onmessage = (event) => {

@@ -20,7 +20,13 @@ function NotificationBell() {
     const token = localStorage.getItem("access-token");
 
 socketRef.current = new WebSocket(
-  `ws://127.0.0.1:8000/ws/notifications/?token=${token}`
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+const WS_BASE_URL = import.meta.env.VITE_BACKEND_URL.replace(/^https?/, protocol);
+
+const socket = new WebSocket(
+  `${WS_BASE_URL}/ws/notifications/?token=${token}`
+);
+
 );
 
 
