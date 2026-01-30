@@ -22,7 +22,7 @@ export default function Payment() {
   // 🔹 Fetch addresses
   const loadAddresses = async () => {
     try {
-      const res = await api.get("/adresses/");
+      const res = await api.get("/addresses/");
       setAddresses(res.data);
 
       const def = res.data.find(a => a.is_default);
