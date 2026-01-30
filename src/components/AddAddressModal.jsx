@@ -17,7 +17,7 @@ function AddAddressModal({ onClose, onSuccess }) {
 
   const handleSubmit = async () => {
     try {
-      await api.post("/adresses/", form);
+      await api.post("/addresses/", form);
       onSuccess();
       onClose();
     } catch {
