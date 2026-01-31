@@ -25,7 +25,7 @@ function Cart() {
 
   const getAddresses = async () => {
     try {
-      const res = await api.get("/adresses/");
+      const res = await api.get("/addresses/");
       setAddresses(res.data);
 
       const defaultAddress = res.data.find(a => a.is_default);
